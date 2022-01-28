@@ -66,6 +66,33 @@ html, body {
   z-index: 1;
 }
 
+.cryptodino-actions {
+  display: flex;
+  margin-top: 2rem;
+  justify-content: space-evenly;
+}
+
+.cryptodino-action-button {
+  display: flex;
+  flex-direction: row;
+  background-color: white;
+  color: black;
+  align-items: center;
+  width: 10rem;
+}
+
+.cryptodino-action-button-icon {
+  object-fit: contain;
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.cryptodino-action-button-text {
+  width: 100%;
+  font-family: "Press Start 2P";
+  font-size: 0.70rem;
+}
+
 #offline-resources {
   display: none;
 }
