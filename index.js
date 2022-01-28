@@ -2737,17 +2737,21 @@ function onDocumentLoad() {
 
     const handleLoginWithNear = () => {
       wallet.requestSignIn(
-        "example-contract.testnet", // contract requesting access
+        "rudi114.testnet", // contract requesting access
         "Example App", // optional
-        "http://YOUR-URL.com/success", // optional
+        "file:///home/lewys/dev/crypto/near-buildathon/t-rex-runner/index.html", // optional
         "http://YOUR-URL.com/failure" // optional
       );
     }
 
     connectWithNearButton.onclick = handleLoginWithNear;
-
   }
   initNear();
+
+  // TODO: check if signed in to show addr/signout experience vs. "Connect"
+  if(wallet.isSignedIn()) {
+    alert('is signed in yay');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', onDocumentLoad);
