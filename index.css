@@ -26,7 +26,6 @@ html, body {
   display: none;
 }
 
-
 /* Offline page */
 
 .offline .interstitial-wrapper {
@@ -80,7 +79,10 @@ html, body {
   background-color: white;
   color: black;
   align-items: center;
-  width: 10rem;
+  justify-content: center;
+  text-align: center;
+  width: 8rem;
+  height: 2.5rem;
 }
 
 .cryptodino-action-button-icon {
