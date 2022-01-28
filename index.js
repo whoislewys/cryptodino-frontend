@@ -71,6 +71,8 @@
             this.loadImages();
         }
     }
+
+
     window['Runner'] = Runner;
 
 
@@ -2709,7 +2711,43 @@
 
 
 function onDocumentLoad() {
-    new Runner('.interstitial-wrapper');
+  new Runner('.interstitial-wrapper');
+
+  /* Action Button Implementations */
+  // NEAR Login
+  // yoinked from docs here: https://docs.near.org/docs/api/naj-quick-reference#wallet
+  const initNear = async () => {
+    const { connect, keyStores, WalletConnection } = nearApi;
+
+    const config = {
+      networkId: "testnet",
+      keyStore: new keyStores.BrowserLocalStorageKeyStore(),
+      nodeUrl: "https://rpc.testnet.near.org",
+      walletUrl: "https://wallet.testnet.near.org",
+      helperUrl: "https://helper.testnet.near.org",
+      explorerUrl: "https://explorer.testnet.near.org",
+    };
+
+    // connect to NEAR
+    const near = await connect(config);
+
+    // create wallet connection
+    const wallet = new WalletConnection(near);
+    const connectWithNearButton = document.getElementById('login-with-near-button');
+
+    const handleLoginWithNear = () => {
+      wallet.requestSignIn(
+        "example-contract.testnet", // contract requesting access
+        "Example App", // optional
+        "http://YOUR-URL.com/success", // optional
+        "http://YOUR-URL.com/failure" // optional
+      );
+    }
+
+    connectWithNearButton.onclick = handleLoginWithNear;
+
+  }
+  initNear();
 }
 
 document.addEventListener('DOMContentLoaded', onDocumentLoad);

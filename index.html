@@ -8,7 +8,13 @@
     <link rel="stylesheet" href="index.css">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Press+Start+2P">
+
+    <!--> SCRIPTS </--!>
+
     <script src="index.js"></script>
+    <!--> near-js-api </--!>
+    <script src="https://cdn.jsdelivr.net/npm/near-api-js@0.41.0/dist/near-api-js.min.js"></script>
+
 </head>
 
 <body id="t" class="offline">
@@ -20,7 +26,7 @@
      
 
         <div class='cryptodino-actions'>
-          <button class='cryptodino-action-button'>
+          <button class='cryptodino-action-button' id='login-with-near-button'>
             <img src='assets/near_icon.png' class='cryptodino-action-button-icon'></img>
             <p class='cryptodino-action-button-text'>Connect</p>
           </button>
