@@ -81,8 +81,8 @@ html, body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  width: 8rem;
-  height: 2.5rem;
+  width: 7rem;
+  height: 2rem;
 }
 
 .cryptodino-action-button-icon {
@@ -94,7 +94,7 @@ html, body {
 .cryptodino-action-button-text {
   width: 100%;
   font-family: "Press Start 2P";
-  font-size: 0.70rem;
+  font-size: 0.55rem;
 }
 
 #offline-resources {

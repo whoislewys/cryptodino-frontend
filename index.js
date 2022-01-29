@@ -2749,7 +2749,7 @@ function onDocumentLoad() {
   initNear();
 
   // TODO: check if signed in to show addr/signout experience vs. "Connect"
-  if(wallet.isSignedIn()) {
+  if (wallet.isSignedIn()) {
     alert('is signed in yay');
   }
 }
