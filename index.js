@@ -169,7 +169,8 @@
             PTERODACTYL: { x: 134, y: 2 },
             RESTART: { x: 2, y: 2 },
             TEXT_SPRITE: { x: 655, y: 2 },
-            TREX: { x: 848, y: 2 },
+            DINOCOIN: { x: 1231, y: 2 },
+            // TREX: { x: 848, y: 2 },
             STAR: { x: 645, y: 2 }
         },
         HDPI: {
@@ -181,7 +182,8 @@
             PTERODACTYL: { x: 260, y: 2 },
             RESTART: { x: 2, y: 2 },
             TEXT_SPRITE: { x: 1294, y: 2 },
-            TREX: { x: 1678, y: 2 },
+            DINOCOIN: { x: 2441, y: 2 },
+            // TREX: { x: 1678, y: 2 },
             STAR: { x: 1276, y: 2 }
         }
     };
@@ -298,7 +300,6 @@
          */
         loadImages: function () {
             if (IS_HIDPI) {
-                console.log('is hidpi')
                 Runner.spriteSheet = document.getElementById('offline-resources-2x');
                 this.spriteDef = Runner.spriteDefinition.HDPI;
 
@@ -572,6 +573,7 @@
                 }
 
                 // Check for collisions.
+                // DEBUG MODE: pass in this.canvasCtx as 3rd arg
                 var collision = hasObstacles &&
                     checkForCollision(this.horizon.obstacles[0], this.tRex);
 
@@ -1302,6 +1304,8 @@
              * @param {number} speed
              */
             init: function (speed) {
+                console.log('drawing obstacle of type: ', this.typeConfig)
+
                 this.cloneCollisionBoxes();
 
                 // Only allow sizing if we're at the right speed.
@@ -1496,7 +1500,27 @@
             numFrames: 2,
             frameRate: 1000 / 6,
             speedOffset: .8
-        }
+        },
+        {
+            type: 'DINOCOIN',
+            width: 18, // width in 2x spritesheet must be 36
+            height: 20, // similarly, height of 40 per coin
+            yPos: [100, 75, 50], // Variable height.
+            yPosMobile: [100, 50], // Variable height mobile.
+            multipleSpeed: 999,
+            minSpeed: 10,
+            minGap: 150,
+            collisionBoxes: [
+              new CollisionBox(15, 15, 16, 5),
+              new CollisionBox(18, 21, 24, 6),
+              new CollisionBox(2, 14, 4, 3),
+              new CollisionBox(6, 10, 4, 7),
+              new CollisionBox(10, 8, 6, 9)
+            ],
+            numFrames: 12,
+            frameRate: 1000/6,
+            speedOffset: .8
+        },
     ];
 
 
@@ -2763,13 +2787,14 @@ function onDocumentLoad() {
     }
 
     connectWithNearButton.onclick = handleLoginWithNear;
+
+  // TODO: check if signed in to show addr/signout experience vs. "Connect"
+  // if (wallet.isSignedIn()) {
+  //   alert('is signed in yay');
+  // }
   }
   initNear();
 
-  // TODO: check if signed in to show addr/signout experience vs. "Connect"
-  if (wallet.isSignedIn()) {
-    alert('is signed in yay');
-  }
 }
 
 document.addEventListener('DOMContentLoaded', onDocumentLoad);
