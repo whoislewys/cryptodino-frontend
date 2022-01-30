@@ -186,6 +186,15 @@
         }
     };
 
+    Runner.trexSpriteDefinition = {
+      LDPI: {
+        TREX: { x: 0, y: 2 },
+      },
+      HDPI: {
+        TREX: { x: 0, y: 2 },
+      },
+    }
+
 
     /**
      * Sound FX. Reference to the ID of the audio tag on interstitial page.
@@ -289,18 +298,27 @@
          */
         loadImages: function () {
             if (IS_HIDPI) {
-                Runner.imageSprite = document.getElementById('offline-resources-2x');
+                console.log('is hidpi')
+                Runner.spriteSheet = document.getElementById('offline-resources-2x');
                 this.spriteDef = Runner.spriteDefinition.HDPI;
+
+                // Load isolated dino sprite sheet (isolating from other sprites makes skinning dino / swapping for other characters easier)
+                Runner.trexSpriteSheet = document.getElementById('offline-dino-sprites-2x');
+                this.trexSpriteDef = Runner.trexSpriteDefinition.HDPI;
             } else {
-                Runner.imageSprite = document.getElementById('offline-resources-1x');
+                console.log('is NOT hidpi')
+                Runner.spriteSheet = document.getElementById('offline-resources-1x');
                 this.spriteDef = Runner.spriteDefinition.LDPI;
+
+                Runner.trexSpriteSheet = document.getElementById('offline-dino-sprites-2x');
+                this.trexSpriteDef = Runner.trexSpriteDefinition.HDPI;
             }
 
-            if (Runner.imageSprite.complete) {
+            if (Runner.spriteSheet.complete) {
                 this.init();
             } else {
                 // If the images are not yet loaded, add a listener.
-                Runner.imageSprite.addEventListener(Runner.events.LOAD,
+                Runner.spriteSheet.addEventListener(Runner.events.LOAD,
                     this.init.bind(this));
             }
         },
@@ -378,7 +396,7 @@
                 this.spriteDef.TEXT_SPRITE, this.dimensions.WIDTH);
 
             // Draw t-rex
-            this.tRex = new Trex(this.canvas, this.spriteDef.TREX);
+            this.tRex = new Trex(this.canvas, this.trexSpriteDef.TREX);
 
             this.outerContainerEl.appendChild(this.containerEl);
 
@@ -1079,12 +1097,12 @@
             textSourceY += this.textImgPos.y;
 
             // Game over text from sprite.
-            this.canvasCtx.drawImage(Runner.imageSprite,
+            this.canvasCtx.drawImage(Runner.spriteSheet,
                 textSourceX, textSourceY, textSourceWidth, textSourceHeight,
                 textTargetX, textTargetY, textTargetWidth, textTargetHeight);
 
             // Restart button.
-            this.canvasCtx.drawImage(Runner.imageSprite,
+            this.canvasCtx.drawImage(Runner.spriteSheet,
                 this.restartImgPos.x, this.restartImgPos.y,
                 restartSourceWidth, restartSourceHeight,
                 restartTargetX, restartTargetY, dimensions.RESTART_WIDTH,
@@ -1348,7 +1366,7 @@
                     sourceX += sourceWidth * this.currentFrame;
                 }
 
-                this.canvasCtx.drawImage(Runner.imageSprite,
+                this.canvasCtx.drawImage(Runner.spriteSheet,
                     sourceX, this.spritePos.y,
                     sourceWidth * this.size, sourceHeight,
                     this.xPos, this.yPos,
@@ -1703,7 +1721,7 @@
 
             // Ducking.
             if (this.ducking && this.status != Trex.status.CRASHED) {
-                this.canvasCtx.drawImage(Runner.imageSprite, sourceX, sourceY,
+                this.canvasCtx.drawImage(Runner.trexSpriteSheet, sourceX, sourceY,
                     sourceWidth, sourceHeight,
                     this.xPos, this.yPos,
                     this.config.WIDTH_DUCK, this.config.HEIGHT);
@@ -1713,7 +1731,7 @@
                     this.xPos++;
                 }
                 // Standing / running
-                this.canvasCtx.drawImage(Runner.imageSprite, sourceX, sourceY,
+                this.canvasCtx.drawImage(Runner.trexSpriteSheet, sourceX, sourceY,
                     sourceWidth, sourceHeight,
                     this.xPos, this.yPos,
                     this.config.WIDTH, this.config.HEIGHT);
@@ -1858,7 +1876,7 @@
     function DistanceMeter(canvas, spritePos, canvasWidth) {
         this.canvas = canvas;
         this.canvasCtx = canvas.getContext('2d');
-        this.image = Runner.imageSprite;
+        this.image = Runner.spriteSheet;
         this.spritePos = spritePos;
         this.x = 0;
         this.y = 5;
@@ -2168,7 +2186,7 @@
                 sourceHeight = sourceHeight * 2;
             }
 
-            this.canvasCtx.drawImage(Runner.imageSprite, this.spritePos.x,
+            this.canvasCtx.drawImage(Runner.spriteSheet, this.spritePos.x,
                 this.spritePos.y,
                 sourceWidth, sourceHeight,
                 this.xPos, this.yPos,
@@ -2313,7 +2331,7 @@
             // Stars.
             if (this.drawStars) {
                 for (var i = 0; i < NightMode.config.NUM_STARS; i++) {
-                    this.canvasCtx.drawImage(Runner.imageSprite,
+                    this.canvasCtx.drawImage(Runner.spriteSheet,
                         starSourceX, this.stars[i].sourceY, starSize, starSize,
                         Math.round(this.stars[i].x), this.stars[i].y,
                         NightMode.config.STAR_SIZE, NightMode.config.STAR_SIZE);
@@ -2321,7 +2339,7 @@
             }
 
             // Moon.
-            this.canvasCtx.drawImage(Runner.imageSprite, moonSourceX,
+            this.canvasCtx.drawImage(Runner.spriteSheet, moonSourceX,
                 this.spritePos.y, moonSourceWidth, moonSourceHeight,
                 Math.round(this.xPos), this.yPos,
                 moonOutputWidth, NightMode.config.HEIGHT);
@@ -2430,13 +2448,13 @@
          * Draw the horizon line.
          */
         draw: function () {
-            this.canvasCtx.drawImage(Runner.imageSprite, this.sourceXPos[0],
+            this.canvasCtx.drawImage(Runner.spriteSheet, this.sourceXPos[0],
                 this.spritePos.y,
                 this.sourceDimensions.WIDTH, this.sourceDimensions.HEIGHT,
                 this.xPos[0], this.yPos,
                 this.dimensions.WIDTH, this.dimensions.HEIGHT);
 
-            this.canvasCtx.drawImage(Runner.imageSprite, this.sourceXPos[1],
+            this.canvasCtx.drawImage(Runner.spriteSheet, this.sourceXPos[1],
                 this.spritePos.y,
                 this.sourceDimensions.WIDTH, this.sourceDimensions.HEIGHT,
                 this.xPos[1], this.yPos,
