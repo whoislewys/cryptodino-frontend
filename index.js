@@ -54,7 +54,7 @@
 
         this.playCount = 0;
 
-        this.tokensCollected = 0;
+        this.tokensCollected = parseInt(window.localStorage.getItem('dinotoken')) || 0;
 
         // Sound FX.
         this.audioBuffer = null;
@@ -793,6 +793,7 @@
          * Game over state.
          */
         gameOver: function () {
+            window.localStorage.setItem('dinotoken', Runner.instance_.tokensCollected);
             this.playSound(this.soundFx.HIT);
             vibrate(200);
 
@@ -1167,15 +1168,13 @@
                         drawCollisionBoxes(opt_canvasCtx, adjTrexBox, adjObstacleBox);
                     }
 
-                    // console.log('crashed', crashed);
-                    // console.log('obstacle type: ', obstacle.typeConfig.type)
-                    // if (crashed && obstacle.typeConfig.type === 'DINOCOIN') {
-                    //   console.log('crashed with dinocoin')
-                    //   this.tokensCollected++;
-                    //   document.getElementById('cryptodino-coins-collected').innerHTML = this.tokensCollected;
-                      // return false;
-                    if (crashed) {
-                      return [adjTrexBox, adjObstacleBox];
+                    if  (crashed && obstacle.typeConfig.type === 'DINOCOIN' ) {
+                        Runner.instance_.tokensCollected += 1
+                        document.getElementById('cryptodino-coins-collected').innerHTML = Runner.instance_.tokensCollected;
+                        obstacle.remove = true
+                        return false
+                    } else if (crashed) {
+                        return [adjTrexBox, adjObstacleBox];
                     }
                 }
             }
@@ -1518,10 +1517,7 @@
             minGap: 150,
             collisionBoxes: [
               new CollisionBox(15, 15, 16, 5),
-              new CollisionBox(18, 21, 24, 6),
-              new CollisionBox(2, 14, 4, 3),
-              new CollisionBox(6, 10, 4, 7),
-              new CollisionBox(10, 8, 6, 9)
+              // TO DO: update this collision box... theres still something funky going on here
             ],
             numFrames: 12,
             frameRate: 1000/6,
@@ -2759,6 +2755,7 @@
 
 
 function onDocumentLoad() {
+  document.getElementById('cryptodino-coins-collected').innerHTML = parseInt(window.localStorage.getItem('dinotoken')) || 0;
   new Runner('.interstitial-wrapper');
 
   /* Action Button Implementations */
