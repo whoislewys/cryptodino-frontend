@@ -312,7 +312,7 @@
                 Runner.spriteSheet = document.getElementById('offline-resources-1x');
                 this.spriteDef = Runner.spriteDefinition.LDPI;
 
-                Runner.trexSpriteSheet = document.getElementById('offline-dino-sprites-2x');
+                Runner.trexSpriteSheet = document.getElementById('offline-dino-sprites-1x');
                 this.trexSpriteDef = Runner.trexSpriteDefinition.HDPI;
             }
 
@@ -2765,8 +2765,13 @@ function onDocumentLoad() {
   // NEAR Login
   // yoinked from docs here: https://docs.near.org/docs/api/naj-quick-reference#wallet
   const initNear = async () => {
+    // function () => {
+    //   connectWithNearButton:
+    // }
+
     const { connect, keyStores, WalletConnection } = nearApi;
 
+    // 1. connect user's wallet to NEAR chain
     const config = {
       networkId: "testnet",
       keyStore: new keyStores.BrowserLocalStorageKeyStore(),
@@ -2775,29 +2780,31 @@ function onDocumentLoad() {
       helperUrl: "https://helper.testnet.near.org",
       explorerUrl: "https://explorer.testnet.near.org",
     };
-
-    // connect to NEAR
     const near = await connect(config);
-
-    // create wallet connection
     const wallet = new WalletConnection(near);
-    const connectWithNearButton = document.getElementById('login-with-near-button');
 
+    // TODO: give user different button contents upon successful login if signed in to show addr/signout experience vs. "Connect"
+
+    // 2. login
+    // redirects to webwallet to authorize the dApp & create an acess key stored in localstorage
+    // for connecting to NEAR & signing transactions via keyStore
+    const connectWithNearButton = document.getElementById('login-with-near-button');
     const handleLoginWithNear = () => {
-      wallet.requestSignIn(
+      const signInRes = wallet.requestSignIn(
         "rudi114.testnet", // contract requesting access
         "Example App", // optional
         "file:///home/lewys/dev/crypto/near-buildathon/t-rex-runner/index.html", // optional
         "http://YOUR-URL.com/failure" // optional
       );
+      console.log('signin res; ', res);
+
+      // if (wallet.isSignedIn()) {
+      //   alert('is signed in yay');
+      // }
     }
 
     connectWithNearButton.onclick = handleLoginWithNear;
 
-  // TODO: check if signed in to show addr/signout experience vs. "Connect"
-  // if (wallet.isSignedIn()) {
-  //   alert('is signed in yay');
-  // }
   }
   initNear();
 
