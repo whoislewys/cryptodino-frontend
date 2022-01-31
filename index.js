@@ -54,6 +54,8 @@
 
         this.playCount = 0;
 
+        this.tokensCollected = 0;
+
         // Sound FX.
         this.audioBuffer = null;
         this.soundFx = {};
@@ -307,7 +309,6 @@
                 Runner.trexSpriteSheet = document.getElementById('offline-dino-sprites-2x');
                 this.trexSpriteDef = Runner.trexSpriteDefinition.HDPI;
             } else {
-                console.log('is NOT hidpi')
                 Runner.spriteSheet = document.getElementById('offline-resources-1x');
                 this.spriteDef = Runner.spriteDefinition.LDPI;
 
@@ -1166,8 +1167,15 @@
                         drawCollisionBoxes(opt_canvasCtx, adjTrexBox, adjObstacleBox);
                     }
 
-                    if (crashed) {
-                        return [adjTrexBox, adjObstacleBox];
+                    console.log('crashed', crashed);
+                    console.log('obstacle type: ', obstacle.typeConfig.type)
+                    if (crashed && obstacle.typeConfig.type === 'DINOCOIN') {
+                      console.log('crashed with dinocoin')
+                      this.tokensCollected++;
+                      document.getElementById('cryptodino-coins-collected').innerHTML = this.tokensCollected;
+                      return false;
+                    } else {
+                      return [adjTrexBox, adjObstacleBox];
                     }
                 }
             }
@@ -1304,8 +1312,6 @@
              * @param {number} speed
              */
             init: function (speed) {
-                console.log('drawing obstacle of type: ', this.typeConfig)
-
                 this.cloneCollisionBoxes();
 
                 // Only allow sizing if we're at the right speed.
@@ -1508,7 +1514,7 @@
             yPos: [100, 75, 50], // Variable height.
             yPosMobile: [100, 50], // Variable height mobile.
             multipleSpeed: 999,
-            minSpeed: 10,
+            minSpeed: 0,
             minGap: 150,
             collisionBoxes: [
               new CollisionBox(15, 15, 16, 5),
