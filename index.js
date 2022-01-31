@@ -1167,14 +1167,14 @@
                         drawCollisionBoxes(opt_canvasCtx, adjTrexBox, adjObstacleBox);
                     }
 
-                    console.log('crashed', crashed);
-                    console.log('obstacle type: ', obstacle.typeConfig.type)
-                    if (crashed && obstacle.typeConfig.type === 'DINOCOIN') {
-                      console.log('crashed with dinocoin')
-                      this.tokensCollected++;
-                      document.getElementById('cryptodino-coins-collected').innerHTML = this.tokensCollected;
-                      return false;
-                    } else {
+                    // console.log('crashed', crashed);
+                    // console.log('obstacle type: ', obstacle.typeConfig.type)
+                    // if (crashed && obstacle.typeConfig.type === 'DINOCOIN') {
+                    //   console.log('crashed with dinocoin')
+                    //   this.tokensCollected++;
+                    //   document.getElementById('cryptodino-coins-collected').innerHTML = this.tokensCollected;
+                      // return false;
+                    if (crashed) {
                       return [adjTrexBox, adjObstacleBox];
                     }
                 }
