@@ -97,6 +97,54 @@ html, body {
   font-size: 0.55rem;
 }
 
+.popup {
+  margin: 30px;
+  padding: 10px;
+  width: calc(100% - 84px);
+  height: 300px;
+  overflow-y: scroll;
+  /* border: 1px solid red; */
+  border-width: 2px;
+  border-style: outset;
+  border-left-color:rgb(118, 118, 118);
+  border-top-color:rgb(118, 118, 118);
+  border-right-color: rgb(33, 33, 33);
+  border-bottom-color: rgb(33, 33, 33);
+  /* border-color: -internal-light-dark(rgb(118, 118, 118), rgb(133, 133, 133)); */
+  border-image: initial;
+}
+
+.inventory-slot {
+  width: 50px;
+  height: 50px;
+  margin: 10px;
+  border-width: 2px;
+  border-style: outset;
+  border-left-color:rgb(118, 118, 118);
+  border-top-color:rgb(118, 118, 118);
+  border-right-color: rgb(33, 33, 33);
+  border-bottom-color: rgb(33, 33, 33);
+  border-image: initial;
+  background-color: white;
+  color: black;
+}
+
+.inventory-slot-set {
+  display: flex;
+}
+
+.text {
+  margin-left: 10px;
+}
+
+#inventory {
+  display: none;
+}
+
+#info { 
+  display: none;
+}
+
 #offline-resources {
   display: none;
 }
