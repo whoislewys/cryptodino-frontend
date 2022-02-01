@@ -1575,8 +1575,9 @@
     Trex.config = {
         DROP_VELOCITY: -5,
         GRAVITY: 0.6,
-        // OG Height
+        // OG Sprite Height
         // HEIGHT: 47,
+        // Cowboy hat height
         HEIGHT: 57,
         HEIGHT_DUCK: 25,
         INIITAL_JUMP_VELOCITY: -10,
@@ -1586,6 +1587,7 @@
         SPEED_DROP_COEFFICIENT: 3,
         // OG Sprite width
         // SPRITE_WIDTH: 262,
+        // Cowboy hat width
         SPRITE_WIDTH: 281,
         START_X_POS: 50,
         WIDTH: 47,
@@ -1636,16 +1638,26 @@
      * @enum {Object}
      */
     Trex.animFrames = {
+      // TODO: change frames
         WAITING: {
-            frames: [44, 0],
+            // OG sprite frames
+            // frames: [44, 0],
+            // Cowboy Hat Sprite Frames
+            frames: [47, 0],
             msPerFrame: 1000 / 3
         },
         RUNNING: {
-            frames: [88, 132],
+            // OG sprite frames
+            // frames: [88, 132],
+            // Cowboy Hat Sprite Frames
+            frames: [94, 141],
             msPerFrame: 1000 / 12
         },
         CRASHED: {
-            frames: [220],
+            // OG sprite frames
+            // frames: [220],
+            // Cowboy Hat Sprite Frames
+            frames: [238],
             msPerFrame: 1000 / 60
         },
         JUMPING: {
@@ -1653,7 +1665,7 @@
             msPerFrame: 1000 / 60
         },
         DUCKING: {
-            frames: [264, 323],
+            frames: [285, 347],
             msPerFrame: 1000 / 8
         }
     };
