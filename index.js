@@ -2778,38 +2778,41 @@ function onDocumentLoad() {
     window.nearConfig = nearConfig;
 
     window.near = await nearApi.connect(Object.assign({deps: {keyStore: new nearApi.keyStores.BrowserLocalStorageKeyStore()}}, nearConfig));
+    window.wallet = new WalletConnection(near);
 
     // Initializing Wallet based Account. It can work with NEAR TestNet wallet that
     // is hosted at https://wallet.testnet.near.org
     window.walletAccount = new nearApi.WalletAccount(window.near);
 
+    console.log('wallet: ', window.wallet);
+    console.log('walletAcc: ', window.walletAccount);
+
     // Getting the Account ID. If unauthorized yet, it's just empty string.
     window.accountId = window.walletAccount.getAccountId();
 
     // Initializing our contract APIs by contract name and configuration.
-    window.contract = await window.near.loadContract(nearConfig.contractName, {
-      // NOTE: This configuration only needed while NEAR is still in development
-      // View methods are read only. They don't modify the state, but usually return some value.
-      viewMethods: ['ft_balance_of'],
-      // Change methods can modify the state. But you don't receive the returned value when called.
-      changeMethods: ['ft_transfer'],
-      // Sender is the account ID to initialize transactions.
-      sender: window.accountId,
-    });
+    // window.contract = await window.near.loadContract(nearConfig.contractName, {
+    //   // NOTE: This configuration only needed while NEAR is still in development
+    //   // View methods are read only. They don't modify the state, but usually return some value.
+    //   viewMethods: ['ft_balance_of'],
+    //   // Change methods can modify the state. But you don't receive the returned value when called.
+    //   changeMethods: ['ft_transfer'],
+    //   // Sender is the account ID to initialize transactions.
+    //   sender: window.accountId,
+    // });
 
     // above is from near examples repo, docs have something diff. trying the docs version here
 
-    // console.log('waleacount: ', window.walletAccount);
-    // const contract = new nearAPI.Contract(
-    //   window.walletAccount, // the account object that is connecting
-    //   "",
-    //   {
-    //     // name of contract you're connecting to
-    //     viewMethods: ["getMessages"], // view methods do not change state but usually return a value
-    //     changeMethods: ["addMessage"], // change methods modify state
-    //     sender: wallet.Account(), // account object to initialize and sign transactions.
-    //   }
-    // );
+    window.contract = new nearApi.Contract(
+      window.walletAccount, // the account object that is connecting
+      nearConfig.contractName,
+      {
+        // name of contract you're connecting to
+        viewMethods: ['ft_balance_of'], // view methods do not change state but usually return a value
+        changeMethods: ['ft_transfer'], // change methods modify state
+        sender: window.walletAccount, // account object to initialize and sign transactions.
+      }
+    );
   }
 
   // Using initialized contract
@@ -2847,8 +2850,14 @@ function onDocumentLoad() {
     // Check balance
     console.log('acc id: ', window.accountId);
     console.log('contract: ', window.contract);
-    const myBalance = await window.contract.ft_balance_of({ account_id: window.accountId });
-    console.warn('balance: ', myBalance);
+    try {
+      console.log('boutta check bal');
+      const myBalance = await window.contract.ft_balance_of({ account_id: window.accountId });
+      console.error('my balance: ', myBalance);
+    } catch (e) {
+      console.error('e: ', e);
+    }
+    // console.warn('balance: ', myBalance);
 
     // Call transfer when clicking claim toks button
     document.getElementById('claim-toks-button').addEventListener('click', async () => {
