@@ -2793,8 +2793,8 @@ function onDocumentLoad() {
       const signInRes = wallet.requestSignIn(
         "rudi114.testnet", // contract requesting access
         "Example App", // optional
-        "file:///home/lewys/dev/crypto/near-buildathon/t-rex-runner/index.html", // optional
-        "http://YOUR-URL.com/failure" // optional
+        "http://127.0.0.1:8080/", // optional
+        "http://127.0.0.1:8080/" // optional
       );
       console.log('signin res; ', res);
 
