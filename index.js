@@ -2757,57 +2757,125 @@
     };
 })();
 
-
 function onDocumentLoad() {
   new Runner('.interstitial-wrapper');
 
-  /* Action Button Implementations */
-  // NEAR Login
-  // yoinked from docs here: https://docs.near.org/docs/api/naj-quick-reference#wallet
-  const initNear = async () => {
-    // function () => {
-    //   connectWithNearButton:
-    // }
-
+  /* Action Button Implementations / NEAR Integration
+   * yooinked from
+   * https://github.com/near-examples/wallet-example/blob/master/src/main.js
+   * */
+  async function initContract() {
     const { connect, keyStores, WalletConnection } = nearApi;
-
-    // 1. connect user's wallet to NEAR chain
-    const config = {
+    const nearConfig = {
       networkId: "testnet",
-      keyStore: new keyStores.BrowserLocalStorageKeyStore(),
+      contractName: 'rudi114.testnet', // contract requesting access
+      // keyStore: new keyStores.BrowserLocalStorageKeyStore(),
       nodeUrl: "https://rpc.testnet.near.org",
       walletUrl: "https://wallet.testnet.near.org",
       helperUrl: "https://helper.testnet.near.org",
       explorerUrl: "https://explorer.testnet.near.org",
     };
-    const near = await connect(config);
-    const wallet = new WalletConnection(near);
+    window.nearConfig = nearConfig;
 
-    // TODO: give user different button contents upon successful login if signed in to show addr/signout experience vs. "Connect"
+    window.near = await nearApi.connect(Object.assign({deps: {keyStore: new nearApi.keyStores.BrowserLocalStorageKeyStore()}}, nearConfig));
 
-    // 2. login
-    // redirects to webwallet to authorize the dApp & create an acess key stored in localstorage
-    // for connecting to NEAR & signing transactions via keyStore
-    const connectWithNearButton = document.getElementById('login-with-near-button');
-    const handleLoginWithNear = () => {
-      const signInRes = wallet.requestSignIn(
-        "rudi114.testnet", // contract requesting access
-        "Example App", // optional
-        "http://127.0.0.1:8080/", // optional
-        "http://127.0.0.1:8080/" // optional
-      );
-      console.log('signin res; ', res);
+    // Initializing Wallet based Account. It can work with NEAR TestNet wallet that
+    // is hosted at https://wallet.testnet.near.org
+    window.walletAccount = new nearApi.WalletAccount(window.near);
 
-      // if (wallet.isSignedIn()) {
-      //   alert('is signed in yay');
-      // }
-    }
+    // Getting the Account ID. If unauthorized yet, it's just empty string.
+    window.accountId = window.walletAccount.getAccountId();
 
-    connectWithNearButton.onclick = handleLoginWithNear;
+    // Initializing our contract APIs by contract name and configuration.
+    window.contract = await window.near.loadContract(nearConfig.contractName, {
+      // NOTE: This configuration only needed while NEAR is still in development
+      // View methods are read only. They don't modify the state, but usually return some value.
+      viewMethods: ['ft_balance_of'],
+      // Change methods can modify the state. But you don't receive the returned value when called.
+      changeMethods: ['ft_transfer'],
+      // Sender is the account ID to initialize transactions.
+      sender: window.accountId,
+    });
 
+    // above is from near examples repo, docs have something diff. trying the docs version here
+
+    // console.log('waleacount: ', window.walletAccount);
+    // const contract = new nearAPI.Contract(
+    //   window.walletAccount, // the account object that is connecting
+    //   "",
+    //   {
+    //     // name of contract you're connecting to
+    //     viewMethods: ["getMessages"], // view methods do not change state but usually return a value
+    //     changeMethods: ["addMessage"], // change methods modify state
+    //     sender: wallet.Account(), // account object to initialize and sign transactions.
+    //   }
+    // );
   }
-  initNear();
 
+  // Using initialized contract
+  async function doWork() {
+    // Based on whether you've authorized, checking which flow we should go.
+    if (!window.walletAccount.isSignedIn()) {
+      signedOutFlow();
+    } else {
+      signedInFlow();
+    }
+  }
+
+  // Function that initializes the signIn button using WalletAccount
+  function signedOutFlow() {
+    // Displaying the signed out flow container.
+    Array.from(document.querySelectorAll('.signed-out')).forEach(el => el.style.display = '');
+    // Adding an event to a sing-in button.
+    document.getElementById('sign-in').addEventListener('click', () => {
+      window.walletAccount.requestSignIn(
+        // The contract name that would be authorized to be called by the user's account.
+        window.nearConfig.contractName,
+        // This is the app name. It can be anything.
+        'CryptoDino',
+        // We can also provide URLs to redirect on success and failure.
+        // The current URL is used by default.
+      );
+    });
+  }
+
+  // Main function for the signed-in flow (already authorized by the wallet).
+  async function signedInFlow() {
+    // Displaying current account name.
+    document.getElementById('login-with-near-button').innerText = window.accountId;
+
+    // Check balance
+    console.log('acc id: ', window.accountId);
+    console.log('contract: ', window.contract);
+    const myBalance = await window.contract.ft_balance_of({ account_id: window.accountId });
+    console.warn('balance: ', myBalance);
+
+    // Call transfer when clicking claim toks button
+    document.getElementById('claim-toks-button').addEventListener('click', async () => {
+      const transferResp = await window.contract.ft_transfer({
+        receiver_id: 'whoislewys.testnet',
+        amount: 100*10**18,
+      });
+      console.log('transfered. resp: ', transferResp);
+    });
+
+    // // Adding an event to a sing-out button.
+    // document.getElementById('sign-out').addEventListener('click', e => {
+    //   e.preventDefault();
+    //   walletAccount.signOut();
+    //   // Forcing redirect.
+    //   window.location.replace(window.location.origin + window.location.pathname);
+    // });
+
+    // fetch who last said hi without requiring button click
+    // but wait a second so the question is legible
+    // setTimeout(updateWhoSaidHi, 1000);
+  }
+
+  // Loads nearApi and this contract into window scope.
+  window.nearInitPromise = initContract()
+    .then(doWork)
+    .catch(console.error);
 }
 
 document.addEventListener('DOMContentLoaded', onDocumentLoad);
