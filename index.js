@@ -1575,16 +1575,20 @@
     Trex.config = {
         DROP_VELOCITY: -5,
         GRAVITY: 0.6,
-        HEIGHT: 47,
+        // OG Height
+        // HEIGHT: 47,
+        HEIGHT: 57,
         HEIGHT_DUCK: 25,
         INIITAL_JUMP_VELOCITY: -10,
         INTRO_DURATION: 1500,
         MAX_JUMP_HEIGHT: 30,
         MIN_JUMP_HEIGHT: 30,
         SPEED_DROP_COEFFICIENT: 3,
-        SPRITE_WIDTH: 262,
+        // OG Sprite width
+        // SPRITE_WIDTH: 262,
+        SPRITE_WIDTH: 281,
         START_X_POS: 50,
-        WIDTH: 44,
+        WIDTH: 47,
         WIDTH_DUCK: 59
     };
 
