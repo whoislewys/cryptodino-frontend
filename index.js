@@ -576,7 +576,7 @@
                 // Check for collisions.
                 // DEBUG MODE: pass in this.canvasCtx as 3rd arg
                 var collision = hasObstacles &&
-                    checkForCollision(this.horizon.obstacles[0], this.tRex);
+                    checkForCollision(this.horizon.obstacles[0], this.tRex, this.canvasCtx);
 
                 if (!collision) {
                     this.distanceRan += this.currentSpeed * deltaTime / this.msPerFrame;
@@ -1638,7 +1638,6 @@
      * @enum {Object}
      */
     Trex.animFrames = {
-      // TODO: change frames
         WAITING: {
             // OG sprite frames
             // frames: [44, 0],
@@ -2834,6 +2833,7 @@ function onDocumentLoad() {
   // Using initialized contract
   async function doWork() {
     // Based on whether you've authorized, checking which flow we should go.
+    console.log('Window wallet account signed in? ', window.walletAccount.isSignedIn());
     if (!window.walletAccount.isSignedIn()) {
       signedOutFlow();
     } else {
@@ -2843,10 +2843,22 @@ function onDocumentLoad() {
 
   // Function that initializes the signIn button using WalletAccount
   function signedOutFlow() {
-    // Displaying the signed out flow container.
-    Array.from(document.querySelectorAll('.signed-out')).forEach(el => el.style.display = '');
+    // my sign in
+    // document.getElementById('login-with-near-button').addEventListener('click', () => {
+    //   const signInRes = wallet.requestSignIn(
+    //     "rudi114.testnet", // contract requesting access
+    //     "CryptoDino", // optional
+    //     "http://127.0.0.1:8080/", // optional
+    //     "http://127.0.0.1:8080/" // optional
+    //   );
+    //   console.log('signin res; ', signInRes);
+    // });
+
+    // sign in from near example
+    // Array.from(document.querySelectorAll('.signed-out')).forEach(el => el.style.display = '');
     // Adding an event to a sing-in button.
-    document.getElementById('sign-in').addEventListener('click', () => {
+    document.getElementById('login-with-near-button').addEventListener('click', () => {
+      console.log('clicked login')
       window.walletAccount.requestSignIn(
         // The contract name that would be authorized to be called by the user's account.
         window.nearConfig.contractName,
