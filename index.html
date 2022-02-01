@@ -36,16 +36,56 @@
             <p class='cryptodino-action-button-text' id='cryptodino-coins-collected'>NaN</p>
           </button>
 
-          <button class='cryptodino-action-button'>
+          <button class='cryptodino-action-button' onmousedown='toggle("inventory")'>
             <img src='assets/gift-box-icon-trimmed.png' class='cryptodino-action-button-icon'></img>
             <p class='cryptodino-action-button-text'>Skins</p>
           </button>
 
-          <button class='cryptodino-action-button'>
+          <button class='cryptodino-action-button' onmousedown='toggle("info")'>
             <img src='assets/question-icon.png' class='cryptodino-action-button-icon'></img>
             <p class='cryptodino-action-button-text'>Info</p>
           </button>
         </div>
+
+
+        <div class='popup' id='info'>
+          <h3 class='text'>Info</h3>
+          <P class='text'>F.A.Q</P>
+          <p>What is CryptoDino?</p>
+          <p>CryproDino in a cultural revolution combining the best parts of the Information era and the Mesozoic era</p>
+        </div>
+
+
+        <div class='popup' id='inventory'>
+          <h3 class='text'>Inventory</h3>
+          <P class='text'>Total Distance Run - 14,000m</P>
+          <div class='text'>1000m</div>
+          <div class='inventory-slot-set'>
+            <div class='inventory-slot'></div>
+            <div class='inventory-slot'></div>
+            <div class='inventory-slot'></div>
+            <div class='inventory-slot'></div>
+            <div class='inventory-slot'></div>
+          </div>
+          <div class='text'>5000m</div>
+          <div class='inventory-slot-set'>
+            <div class='inventory-slot'></div>
+            <div class='inventory-slot'></div>
+            <div class='inventory-slot'></div>
+            <div class='inventory-slot'></div>
+            <div class='inventory-slot'></div>
+          </div>
+          <div class='text'>25000m</div>
+          <div class='inventory-slot-set'>
+            <div class='inventory-slot'></div>
+            <div class='inventory-slot'></div>
+            <div class='inventory-slot'></div>
+            <div class='inventory-slot'></div>
+            <div class='inventory-slot'></div>
+          </div>
+
+        </div>
+
 
         <div id="main-content">
             <div class="icon icon-offline" alt=""></div>
@@ -74,6 +114,17 @@
         box.style.visibility="hidden";
     }
 };
+</script>
+
+<script>
+  function toggle(type) {
+    let display = document.getElementById(type).style.display;
+    if (display === 'none') {
+      document.getElementById(type).style.display = 'block'
+    } else {
+      document.getElementById(type).style.display = 'none'
+    }
+  }
 </script>
     
 </html>
