@@ -2776,7 +2776,7 @@ function onDocumentLoad() {
    * yooinked from
    * https://github.com/near-examples/wallet-example/blob/master/src/main.js
    * */
-  async function initContract() {
+  async function initContracts() {
     const { connect, keyStores, WalletConnection } = nearApi;
     const nearConfig = {
       networkId: "testnet",
@@ -2833,6 +2833,39 @@ function onDocumentLoad() {
         sender: acct, // account object to initialize and sign transactions.
       }
     );
+
+
+
+        // NFT ACCOUNT CONNECTION
+        const NFTConfig = {
+            networkId: "testnet",
+            contractName: 'dinonft.testnet', // contract requesting access
+            // keyStore: new keyStores.BrowserLocalStorageKeyStore(),
+            keyStore: new keyStores.BrowserLocalStorageKeyStore(),
+            nodeUrl: "https://rpc.testnet.near.org",
+            walletUrl: "https://wallet.testnet.near.org",
+            helperUrl: "https://helper.testnet.near.org",
+            explorerUrl: "https://explorer.testnet.near.org",
+        };
+        window.NFTConfig = NFTConfig;
+    
+        window.NFTnear = await connect(NFTConfig);
+        window.NFTwallet = new WalletConnection(window.NFTnear);
+        window.NFTwalletAccount = new nearApi.WalletAccount(window.NFTnear);
+        window.NFTaccountId = window.NFTwalletAccount.getAccountId();
+    
+        const NFTacct = await NFTnear.account(window.NFTwalletAccount.getAccountId());
+        window.contract = new nearApi.Contract(
+          NFTacct, // the account object that is connecting
+          NFTConfig.contractName,
+          {
+            // name of contract you're connecting to
+            viewMethods: ['nft_token'], // view methods do not change state but usually return a value
+            changeMethods: ['nft_transfer'], // change methods modify state
+            sender: NFTacct, // account object to initialize and sign transactions.
+          }
+        );
+        // END NFT ACCOUNT CONNECTION
   }
 
   // Using initialized contract
@@ -2921,7 +2954,7 @@ function onDocumentLoad() {
   }
 
   // Loads nearApi and this contract into window scope.
-  window.nearInitPromise = initContract()
+  window.nearInitPromise = initContracts()
     .then(doWork)
     .catch(console.error);
 }
