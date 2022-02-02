@@ -2780,7 +2780,7 @@ function onDocumentLoad() {
     const { connect, keyStores, WalletConnection } = nearApi;
     const nearConfig = {
       networkId: "testnet",
-      contractName: 'rudi114.testnet', // contract requesting access
+      contractName: 'dinotoken.testnet', // contract requesting access
       // keyStore: new keyStores.BrowserLocalStorageKeyStore(),
       keyStore: new keyStores.BrowserLocalStorageKeyStore(),
       nodeUrl: "https://rpc.testnet.near.org",
@@ -2851,7 +2851,7 @@ function onDocumentLoad() {
     // my sign in
     // document.getElementById('login-with-near-button').addEventListener('click', () => {
     //   const signInRes = wallet.requestSignIn(
-    //     "rudi114.testnet", // contract requesting access
+    //     "dinotoken.testnet", // contract requesting access
     //     "CryptoDino", // optional
     //     "http://127.0.0.1:8080/", // optional
     //     "http://127.0.0.1:8080/" // optional
