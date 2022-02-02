@@ -2879,6 +2879,12 @@ function onDocumentLoad() {
     // Displaying current account name.
     document.getElementById('login-with-near-button').innerText = window.accountId;
 
+
+    document.getElementById('sign-out').addEventListener('click', async() => {
+      console.log('signing out');
+      window.walletAccount.signOut();
+    })
+
     document.getElementById('get-bal-button').addEventListener('click', async () => {
       try {
         console.log('boutta check bal');
