@@ -2822,14 +2822,15 @@ function onDocumentLoad() {
 
     // above is from near examples repo, docs have something diff. trying the docs version here
 
+    const acct = await near.account(window.walletAccount.getAccountId());
     window.contract = new nearApi.Contract(
-      window.walletAccount, // the account object that is connecting
+      acct, // the account object that is connecting
       nearConfig.contractName,
       {
         // name of contract you're connecting to
         viewMethods: ['ft_balance_of'], // view methods do not change state but usually return a value
         changeMethods: ['ft_transfer'], // change methods modify state
-        sender: window.walletAccount, // account object to initialize and sign transactions.
+        sender: acct, // account object to initialize and sign transactions.
       }
     );
   }
@@ -2890,12 +2891,8 @@ function onDocumentLoad() {
         console.log('boutta check bal');
         console.log('acc id: ', window.accountId);
         console.log('contract: ', window.contract);
-        // TODO: do this on btn click
         const myBalance = await window.contract.ft_balance_of({ account_id: window.accountId });
-
-        'claim-toks-buttonclaim-toks-button'
-
-        console.error('my balance: ', myBalance);
+        console.log('my balance: ', myBalance);
       } catch (e) {
         console.error('e: ', e);
       }
