@@ -2802,11 +2802,22 @@ function onDocumentLoad() {
     const acct = await near.account(window.walletAccount.getAccountId());
     window.contract = new nearApi.Contract(
       acct, // the account object that is connecting
-      'rudi114.testnet',
+      'dinotoken.testnet',
       {
         // name of contract you're connecting to
         viewMethods: ['ft_balance_of'], // view methods do not change state but usually return a value
         changeMethods: ['ft_transfer'], // change methods modify state
+        sender: acct, // account object to initialize and sign transactions.
+      }
+    );
+
+    window.nftContract = new nearApi.Contract(
+      acct, // the account object that is connecting
+      'dinonft.testnet',
+      {
+        // name of contract you're connecting to
+        viewMethods: ['nft_token'], // view methods do not change state but usually return a value
+        changeMethods: ['nft_transfer'], // change methods modify state
         sender: acct, // account object to initialize and sign transactions.
       }
     );
@@ -2830,13 +2841,15 @@ function onDocumentLoad() {
       console.log('clicked login')
       window.walletAccount.requestSignIn(
         // The contract name that would be authorized to be called by the user's account.
-        'rudi114.testnet',
+        'dinotoken.testnet',
         // This is the app name. It can be anything.
         'CryptoDino',
         // We can also provide URLs to redirect on success and failure.
         // The current URL is used by default.
       );
     });
+
+    // TODO: i think also sign into dinonft.testnet here?
   }
 
   async function signedInFlow() {
@@ -2860,7 +2873,7 @@ function onDocumentLoad() {
   }
 
   // Loads nearApi and this contract into window scope.
-  window.nearInitPromise = initContract()
+  window.nearInitPromise = initContracts()
     .then(doWork)
     .catch(console.error);
 }
