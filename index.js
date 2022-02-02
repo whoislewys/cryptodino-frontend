@@ -2782,6 +2782,7 @@ function onDocumentLoad() {
       networkId: "testnet",
       contractName: 'rudi114.testnet', // contract requesting access
       // keyStore: new keyStores.BrowserLocalStorageKeyStore(),
+      keyStore: new keyStores.BrowserLocalStorageKeyStore(),
       nodeUrl: "https://rpc.testnet.near.org",
       walletUrl: "https://wallet.testnet.near.org",
       helperUrl: "https://helper.testnet.near.org",
@@ -2789,8 +2790,14 @@ function onDocumentLoad() {
     };
     window.nearConfig = nearConfig;
 
-    window.near = await nearApi.connect(Object.assign({deps: {keyStore: new nearApi.keyStores.BrowserLocalStorageKeyStore()}}, nearConfig));
-    window.wallet = new WalletConnection(near);
+    // window.near = await nearApi.connect(
+    //   Object.assign({
+    //     deps: {
+    //       keyStore: new nearApi.keyStores.BrowserLocalStorageKeyStore()
+    //     }
+    //   }, nearConfig));
+    window.near = await connect(nearConfig);
+    window.wallet = new WalletConnection(window.near);
 
     // Initializing Wallet based Account. It can work with NEAR TestNet wallet that
     // is hosted at https://wallet.testnet.near.org
@@ -2872,26 +2879,30 @@ function onDocumentLoad() {
     // Displaying current account name.
     document.getElementById('login-with-near-button').innerText = window.accountId;
 
-    // Check balance
-    console.log('acc id: ', window.accountId);
-    console.log('contract: ', window.contract);
-    try {
-      console.log('boutta check bal');
-      const myBalance = await window.contract.ft_balance_of({ account_id: window.accountId });
-      console.error('my balance: ', myBalance);
-    } catch (e) {
-      console.error('e: ', e);
-    }
-    // console.warn('balance: ', myBalance);
+    document.getElementById('get-bal-button').addEventListener('click', async () => {
+      try {
+        console.log('boutta check bal');
+        console.log('acc id: ', window.accountId);
+        console.log('contract: ', window.contract);
+        // TODO: do this on btn click
+        const myBalance = await window.contract.ft_balance_of({ account_id: window.accountId });
+
+        'claim-toks-buttonclaim-toks-button'
+
+        console.error('my balance: ', myBalance);
+      } catch (e) {
+        console.error('e: ', e);
+      }
+    })
 
     // Call transfer when clicking claim toks button
-    document.getElementById('claim-toks-button').addEventListener('click', async () => {
-      const transferResp = await window.contract.ft_transfer({
-        receiver_id: 'whoislewys.testnet',
-        amount: 100*10**18,
-      });
-      console.log('transfered. resp: ', transferResp);
-    });
+    // document.getElementById('claim-toks-button').addEventListener('click', async () => {
+      // const transferResp = await window.contract.ft_transfer({
+      //   receiver_id: 'whoislewys.testnet',
+      //   amount: 100*10**18,
+      // });
+      // console.log('transfered. resp: ', transferResp);
+    // });
 
     // // Adding an event to a sing-out button.
     // document.getElementById('sign-out').addEventListener('click', e => {
