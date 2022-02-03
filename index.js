@@ -2873,11 +2873,8 @@ function onDocumentLoad() {
 
     document.getElementById('cryptodino-coins-collected').addEventListener('click', async () => {
         try {
-          console.log('boutta check bal');
-          console.log('acc id: ', window.accountId);
-          console.log('contract: ', window.contract);
-          const myBalance = await window.contract.ft_transfer({ receiver_id: window.accountId, amount: new BigNumber(100) });
-          console.log('my balance: ', myBalance);
+          const collectCoinsResp = await window.contract.ft_transfer({ receiver_id: window.accountId, amount: new BigNumber.from('100') });
+          console.log('collectCoinsResp', collectCoinsResp);
         } catch (e) {
           console.error('e: ', e);
         }
@@ -2885,36 +2882,12 @@ function onDocumentLoad() {
 
       document.getElementById('cryptodino-storage-deposit').addEventListener('click', async () => {
         try {
-          console.log('boutta check bal');
-          console.log('acc id: ', window.accountId);
-          console.log('contract: ', window.contract);
-          const myBalance = await window.contract.storage_deposit({ account_id: window.accountId, amount: 0.00235 });
-          console.log('my balance: ', myBalance);
+          const storageDepositResp = await window.contract.storage_deposit({ account_id: window.accountId, amount: 0.00235 });
+          console.log('storage deposit resp: ', storageDepositResp);
         } catch (e) {
           console.error('e: ', e);
         }
       })
-
-    // Call transfer when clicking claim toks button
-    // document.getElementById('claim-toks-button').addEventListener('click', async () => {
-      // const transferResp = await window.contract.ft_transfer({
-      //   receiver_id: 'whoislewys.testnet',
-      //   amount: 100*10**18,
-      // });
-      // console.log('transfered. resp: ', transferResp);
-    // });
-
-    // // Adding an event to a sing-out button.
-    // document.getElementById('sign-out').addEventListener('click', e => {
-    //   e.preventDefault();
-    //   walletAccount.signOut();
-    //   // Forcing redirect.
-    //   window.location.replace(window.location.origin + window.location.pathname);
-    // });
-
-    // fetch who last said hi without requiring button click
-    // but wait a second so the question is legible
-    // setTimeout(updateWhoSaidHi, 1000);
   }
 
   // Loads nearApi and this contract into window scope.
