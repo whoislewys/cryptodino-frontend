@@ -2776,13 +2776,12 @@ function onDocumentLoad() {
    * yooinked from
    * https://github.com/near-examples/wallet-example/blob/master/src/main.js
    * */
-  async function initContract() {
-    const { connect, keyStores } = nearApi;
-
-    // NearConfig is used to initialize a connection to the NEAR blockchain
-    // You can use different properties for different environments (testnet, mainnet, etc.)
+  async function initContracts() {
+    const { connect, keyStores, WalletConnection } = nearApi;
     const nearConfig = {
       networkId: "testnet",
+      contractName: 'dinotoken.testnet', // contract requesting access
+      // keyStore: new keyStores.BrowserLocalStorageKeyStore(),
       keyStore: new keyStores.BrowserLocalStorageKeyStore(),
       nodeUrl: "https://rpc.testnet.near.org",
       walletUrl: "https://wallet.testnet.near.org",
@@ -2790,41 +2789,69 @@ function onDocumentLoad() {
       explorerUrl: "https://explorer.testnet.near.org",
     };
     window.nearConfig = nearConfig;
+
+    // window.near = await nearApi.connect(
+    //   Object.assign({
+    //     deps: {
+    //       keyStore: new nearApi.keyStores.BrowserLocalStorageKeyStore()
+    //     }
+    //   }, nearConfig));
     window.near = await connect(nearConfig);
+    window.wallet = new WalletConnection(window.near);
 
     // Initializing Wallet based Account. It can work with NEAR TestNet wallet that
     // is hosted at https://wallet.testnet.near.org
     window.walletAccount = new nearApi.WalletAccount(window.near);
-    // Getting the Account ID (eg 'whoislewys.testnet'). If unauthorized, it's just empty string.
+
+    console.log('wallet: ', window.wallet);
+    console.log('walletAcc: ', window.walletAccount);
+
+    // Getting the Account ID. If unauthorized yet, it's just empty string.
     window.accountId = window.walletAccount.getAccountId();
 
-    // Get an instance of a contract by using contract name and account.
-    const acct = await near.account(window.walletAccount.getAccountId());
+    // Initializing our contract APIs by contract name and configuration.
+    // window.contract = await window.near.loadContract(nearConfig.contractName, {
+    //   // NOTE: This configuration only needed while NEAR is still in development
+    //   // View methods are read only. They don't modify the state, but usually return some value.
+    //   viewMethods: ['ft_balance_of'],
+    //   // Change methods can modify the state. But you don't receive the returned value when called.
+    //   changeMethods: ['ft_transfer'],
+    //   // Sender is the account ID to initialize transactions.
+    //   sender: window.accountId,
+    // });
+
+    // above is from near examples repo, docs have something diff. trying the docs version here
+ 
+    const acct = await near.account(window.walletAccount.getAccountId()); // This is the user
     window.contract = new nearApi.Contract(
       acct, // the account object that is connecting
-      'dinotoken.testnet',
+      nearConfig.contractName,
       {
         // name of contract you're connecting to
         viewMethods: ['ft_balance_of'], // view methods do not change state but usually return a value
-        changeMethods: ['ft_transfer'], // change methods modify state
+        changeMethods: ['ft_transfer','storage_deposit'], // change methods modify state
         sender: acct, // account object to initialize and sign transactions.
       }
     );
 
-    window.nftContract = new nearApi.Contract(
-      acct, // the account object that is connecting
-      'dinonft.testnet',
-      {
-        // name of contract you're connecting to
-        viewMethods: ['nft_token'], // view methods do not change state but usually return a value
-        changeMethods: ['nft_transfer'], // change methods modify state
-        sender: acct, // account object to initialize and sign transactions.
-      }
+    // NFT CONTRACT
+    window.nft = new nearApi.Contract(
+        acct, // the account object that is connecting
+        'dinonft.testnet',
+        {
+          // name of contract you're connecting to
+          viewMethods: ['nft_token'], // view methods do not change state but usually return a value
+          changeMethods: ['nft_transfer'], // change methods modify state
+          sender: acct, // account object to initialize and sign transactions.
+        }
     );
+    // END NFT CONTRACT
   }
 
+  // Using initialized contract
   async function doWork() {
     // Based on whether you've authorized, checking which flow we should go.
+    console.log('Window wallet account signed in? ', window.walletAccount.isSignedIn());
     if (!window.walletAccount.isSignedIn()) {
       signedOutFlow();
     } else {
@@ -2834,42 +2861,100 @@ function onDocumentLoad() {
 
   // Function that initializes the signIn button using WalletAccount
   function signedOutFlow() {
+    // my sign in
+    // document.getElementById('login-with-near-button').addEventListener('click', () => {
+    //   const signInRes = wallet.requestSignIn(
+    //     "dinotoken.testnet", // contract requesting access
+    //     "CryptoDino", // optional
+    //     "http://127.0.0.1:8080/", // optional
+    //     "http://127.0.0.1:8080/" // optional
+    //   );
+    //   console.log('signin res; ', signInRes);
+    // });
 
     // sign in from near example
+    // Array.from(document.querySelectorAll('.signed-out')).forEach(el => el.style.display = '');
     // Adding an event to a sing-in button.
     document.getElementById('login-with-near-button').addEventListener('click', () => {
       console.log('clicked login')
       window.walletAccount.requestSignIn(
         // The contract name that would be authorized to be called by the user's account.
-        'dinotoken.testnet',
+        window.nearConfig.contractName,
         // This is the app name. It can be anything.
         'CryptoDino',
         // We can also provide URLs to redirect on success and failure.
         // The current URL is used by default.
       );
     });
-
-    // TODO: i think also sign into dinonft.testnet here?
   }
 
+  // Main function for the signed-in flow (already authorized by the wallet).
   async function signedInFlow() {
     // Displaying current account name.
     document.getElementById('login-with-near-button').innerText = window.accountId;
 
-    // Sign out button
+
     document.getElementById('sign-out').addEventListener('click', async() => {
+      console.log('signing out');
       window.walletAccount.signOut();
     })
 
-    // Get balance button
     document.getElementById('get-bal-button').addEventListener('click', async () => {
       try {
+        console.log('boutta check bal');
+        console.log('acc id: ', window.accountId);
+        console.log('contract: ', window.contract);
         const myBalance = await window.contract.ft_balance_of({ account_id: window.accountId });
         console.log('my balance: ', myBalance);
       } catch (e) {
         console.error('e: ', e);
       }
     })
+
+    document.getElementById('cryptodino-coins-collected').addEventListener('click', async () => {
+        try {
+          console.log('boutta check bal');
+          console.log('acc id: ', window.accountId);
+          console.log('contract: ', window.contract);
+          const myBalance = await window.contract.ft_transfer({ receiver_id: window.accountId, amount: new BigNumber(100) });
+          console.log('my balance: ', myBalance);
+        } catch (e) {
+          console.error('e: ', e);
+        }
+      })
+
+      document.getElementById('cryptodino-storage-deposit').addEventListener('click', async () => {
+        try {
+          console.log('boutta check bal');
+          console.log('acc id: ', window.accountId);
+          console.log('contract: ', window.contract);
+          const myBalance = await window.contract.storage_deposit({ account_id: window.accountId });
+          console.log('my balance: ', myBalance);
+        } catch (e) {
+          console.error('e: ', e);
+        }
+      })
+
+    // Call transfer when clicking claim toks button
+    // document.getElementById('claim-toks-button').addEventListener('click', async () => {
+      // const transferResp = await window.contract.ft_transfer({
+      //   receiver_id: 'whoislewys.testnet',
+      //   amount: 100*10**18,
+      // });
+      // console.log('transfered. resp: ', transferResp);
+    // });
+
+    // // Adding an event to a sing-out button.
+    // document.getElementById('sign-out').addEventListener('click', e => {
+    //   e.preventDefault();
+    //   walletAccount.signOut();
+    //   // Forcing redirect.
+    //   window.location.replace(window.location.origin + window.location.pathname);
+    // });
+
+    // fetch who last said hi without requiring button click
+    // but wait a second so the question is legible
+    // setTimeout(updateWhoSaidHi, 1000);
   }
 
   // Loads nearApi and this contract into window scope.
