@@ -2873,8 +2873,20 @@ function onDocumentLoad() {
 
     document.getElementById('cryptodino-coins-collected').addEventListener('click', async () => {
         try {
-          const collectCoinsResp = await window.contract.ft_transfer({ receiver_id: window.accountId, amount: new BigNumber.from('100') });
+          console.log('nutsack04');
+          const wallet = new nearApi.WalletConnection(near);
+          const collectCoinsResp = await wallet.account().functionCall({
+            contractId: 'dinotoken.testnet',
+            methodName: 'ft_transfer',
+            args: {
+              receiver_id: 'whoislewys.testnet',
+              amount: '1',
+            },
+            gas: '300000000000000',
+            attachedDeposit: '1',
+          });
           console.log('collectCoinsResp', collectCoinsResp);
+
         } catch (e) {
           console.error('e: ', e);
         }
