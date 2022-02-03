@@ -2821,51 +2821,31 @@ function onDocumentLoad() {
     // });
 
     // above is from near examples repo, docs have something diff. trying the docs version here
-
-    const acct = await near.account(window.walletAccount.getAccountId());
+ 
+    const acct = await near.account(window.walletAccount.getAccountId()); // This is the user
     window.contract = new nearApi.Contract(
       acct, // the account object that is connecting
       nearConfig.contractName,
       {
         // name of contract you're connecting to
         viewMethods: ['ft_balance_of'], // view methods do not change state but usually return a value
-        changeMethods: ['ft_transfer'], // change methods modify state
+        changeMethods: ['ft_transfer','storage_deposit'], // change methods modify state
         sender: acct, // account object to initialize and sign transactions.
       }
     );
 
-
-
-        // NFT ACCOUNT CONNECTION
-        const NFTConfig = {
-            networkId: "testnet",
-            contractName: 'dinonft.testnet', // contract requesting access
-            // keyStore: new keyStores.BrowserLocalStorageKeyStore(),
-            keyStore: new keyStores.BrowserLocalStorageKeyStore(),
-            nodeUrl: "https://rpc.testnet.near.org",
-            walletUrl: "https://wallet.testnet.near.org",
-            helperUrl: "https://helper.testnet.near.org",
-            explorerUrl: "https://explorer.testnet.near.org",
-        };
-        window.NFTConfig = NFTConfig;
-    
-        window.NFTnear = await connect(NFTConfig);
-        window.NFTwallet = new WalletConnection(window.NFTnear);
-        window.NFTwalletAccount = new nearApi.WalletAccount(window.NFTnear);
-        window.NFTaccountId = window.NFTwalletAccount.getAccountId();
-    
-        const NFTacct = await NFTnear.account(window.NFTwalletAccount.getAccountId());
-        window.contract = new nearApi.Contract(
-          NFTacct, // the account object that is connecting
-          NFTConfig.contractName,
-          {
-            // name of contract you're connecting to
-            viewMethods: ['nft_token'], // view methods do not change state but usually return a value
-            changeMethods: ['nft_transfer'], // change methods modify state
-            sender: NFTacct, // account object to initialize and sign transactions.
-          }
-        );
-        // END NFT ACCOUNT CONNECTION
+    // NFT CONTRACT
+    window.nft = new nearApi.Contract(
+        acct, // the account object that is connecting
+        'dinonft.testnet',
+        {
+          // name of contract you're connecting to
+          viewMethods: ['nft_token'], // view methods do not change state but usually return a value
+          changeMethods: ['nft_transfer'], // change methods modify state
+          sender: acct, // account object to initialize and sign transactions.
+        }
+    );
+    // END NFT CONTRACT
   }
 
   // Using initialized contract
@@ -2930,6 +2910,30 @@ function onDocumentLoad() {
         console.error('e: ', e);
       }
     })
+
+    document.getElementById('cryptodino-coins-collected').addEventListener('click', async () => {
+        try {
+          console.log('boutta check bal');
+          console.log('acc id: ', window.accountId);
+          console.log('contract: ', window.contract);
+          const myBalance = await window.contract.ft_transfer({ receiver_id: window.accountId, amount: new BigNumber(100) });
+          console.log('my balance: ', myBalance);
+        } catch (e) {
+          console.error('e: ', e);
+        }
+      })
+
+      document.getElementById('cryptodino-storage-deposit').addEventListener('click', async () => {
+        try {
+          console.log('boutta check bal');
+          console.log('acc id: ', window.accountId);
+          console.log('contract: ', window.contract);
+          const myBalance = await window.contract.storage_deposit({ account_id: window.accountId });
+          console.log('my balance: ', myBalance);
+        } catch (e) {
+          console.error('e: ', e);
+        }
+      })
 
     // Call transfer when clicking claim toks button
     // document.getElementById('claim-toks-button').addEventListener('click', async () => {

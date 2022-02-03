@@ -12,6 +12,9 @@
     <!-- near-js-api -->
     <script src="https://cdn.jsdelivr.net/npm/near-api-js@0.41.0/dist/near-api-js.min.js"></script>
 
+    <!-- bignumber -->
+    <script src='https://cdn.jsdelivr.net/npm/bignumber.js@9.0.2/bignumber.min.js'></script>
+
     <!-- SCRIPTS -->
     <script src="index.js"></script>
 
@@ -33,7 +36,7 @@
 
           <button class='cryptodino-action-button'>
             <img src='assets/dino-token-icon.png' class='cryptodino-action-button-icon'></img>
-            <p class='cryptodino-action-button-text' id='cryptodino-coins-collected'>NaN</p>
+            <p class='cryptodino-action-button-text' id='cryptodino-coins-collected'>0</p>
           </button>
 
           <button class='cryptodino-action-button' onmousedown='toggle("inventory")'>
@@ -58,6 +61,12 @@
         <button class='cryptodino-action-button' id='get-bal-button'>
           <p class='cryptodino-action-button-text'>Get balance</p>
         </button>
+
+        <button class='cryptodino-action-button' id='cryptodino-storage-deposit'>
+          <p class='cryptodino-action-button-text'>Create storage deposit</p>
+        </button>
+
+        
 
         <div class='popup' id='info'>
           <h3 class='text'>Info</h3>
