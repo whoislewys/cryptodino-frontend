@@ -2776,7 +2776,7 @@ function onDocumentLoad() {
    * yooinked from
    * https://github.com/near-examples/wallet-example/blob/master/src/main.js
    * */
-  async function initContract() {
+  async function initContracts() {
     const { connect, keyStores } = nearApi;
 
     // NearConfig is used to initialize a connection to the NEAR blockchain
@@ -2888,7 +2888,7 @@ function onDocumentLoad() {
           console.log('boutta check bal');
           console.log('acc id: ', window.accountId);
           console.log('contract: ', window.contract);
-          const myBalance = await window.contract.storage_deposit({ account_id: window.accountId });
+          const myBalance = await window.contract.storage_deposit({ account_id: window.accountId, amount: 0.00235 });
           console.log('my balance: ', myBalance);
         } catch (e) {
           console.error('e: ', e);
