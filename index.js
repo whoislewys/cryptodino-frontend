@@ -55,6 +55,7 @@
         this.playCount = 0;
 
         this.tokensCollected = parseInt(window.localStorage.getItem('dinotoken')) || 0;
+        this.eggsCollected = parseInt(window.localStorage.getItem('dinoeggs')) || 0;
 
         // Sound FX.
         this.audioBuffer = null;
@@ -172,6 +173,7 @@
             RESTART: { x: 2, y: 2 },
             TEXT_SPRITE: { x: 655, y: 2 },
             DINOCOIN: { x: 1231, y: 2 },
+            DINOEGG: { x: 1146, y: 26 },
             // TREX: { x: 848, y: 2 },
             STAR: { x: 645, y: 2 }
         },
@@ -185,6 +187,7 @@
             RESTART: { x: 2, y: 2 },
             TEXT_SPRITE: { x: 1294, y: 2 },
             DINOCOIN: { x: 2441, y: 2 },
+            DINOEGG: { x: 2441, y: 39 },
             // TREX: { x: 1678, y: 2 },
             STAR: { x: 1276, y: 2 }
         }
@@ -576,7 +579,7 @@
                 // Check for collisions.
                 // DEBUG MODE: pass in this.canvasCtx as 3rd arg
                 var collision = hasObstacles &&
-                    checkForCollision(this.horizon.obstacles[0], this.tRex);
+                    checkForCollision(this.horizon.obstacles[0], this.tRex, this.canvasCtx);
 
                 if (!collision) {
                     this.distanceRan += this.currentSpeed * deltaTime / this.msPerFrame;
@@ -1168,9 +1171,15 @@
                         drawCollisionBoxes(opt_canvasCtx, adjTrexBox, adjObstacleBox);
                     }
 
-                    if  (crashed && obstacle.typeConfig.type === 'DINOCOIN' ) {
+                    if  (crashed && obstacle.typeConfig.type === 'DINOCOIN') {
                         Runner.instance_.tokensCollected += 1
                         document.getElementById('cryptodino-coins-collected').innerHTML = Runner.instance_.tokensCollected;
+                        obstacle.remove = true
+                        return false
+                    } else if (obstacle.typeConfig.type === 'DINOEGG') {
+                        Runner.instance_.eggsCollected += 1
+                        console.log('eggertons: ', Runner.instance_.eggsCollected)
+                        // TODO:  update ui with eggs collected later
                         obstacle.remove = true
                         return false
                     } else if (crashed) {
@@ -1520,6 +1529,22 @@
               // TO DO: update this collision box... theres still something funky going on here
             ],
             numFrames: 12,
+            frameRate: 1000/6,
+            speedOffset: .8
+        },
+        {
+            type: 'DINOEGG',
+            width: 20, // width in 2x spritesheet must be 36
+            height: 24, // similarly, height of 40 per coin
+            yPos: 112,
+            multipleSpeed: 7,
+            minSpeed: 0,
+            minGap: 150,
+            collisionBoxes: [
+              // new CollisionBox(15, 15, 16, 5),
+              new CollisionBox(0, 0, 30, 30),
+            ],
+            numFrames: 1,
             frameRate: 1000/6,
             speedOffset: .8
         },
