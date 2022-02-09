@@ -2831,7 +2831,7 @@ function onDocumentLoad() {
       {
         // name of contract you're connecting to
         viewMethods: ['ft_balance_of'], // view methods do not change state but usually return a value
-        changeMethods: ['ft_transfer','storage_deposit'], // change methods modify state
+        changeMethods: ['ft_transfer','storage_deposit', 'claim'], // change methods modify state
         sender: acct, // account object to initialize and sign transactions.
       }
     );
@@ -2897,28 +2897,39 @@ function onDocumentLoad() {
     })
 
     document.getElementById('cryptodino-action-button-coins-collected').addEventListener('click', async () => {
-        try {
-          const coinsCollected = window.localStorage.getItem('dinotoken');
-          console.log('coins collected: ', coinsCollected);
-          const wallet = new nearApi.WalletConnection(near);
-          const collectCoinsResp = await wallet.account().functionCall({
-            contractId: 'dinotoken.testnet',
-            methodName: 'claim',
-            args: {
-              receiver_id: window.accountId,
-              amount: String(coinsCollected),
-            },
-            gas: '300000000000000',
-            attachedDeposit: '1',
-          });
-          console.log('collectCoinsResp', collectCoinsResp);
+      try {
+        const coinsCollected = window.localStorage.getItem('dinotoken');
+        console.log('coins collected: ', coinsCollected);
 
-          // Once claimed, set toks in localstorage to 0
-          // const coinsCollected = window.localStorage.setItem('dinotoken', 0);
-        } catch (e) {
-          console.error('e: ', e);
-        }
-      })
+        const claimRes = await window.contract.claim({
+          receiver_id: window.accountId,
+          amount: String(coinsCollected),
+        },
+          300000000000000, // attached GAS (optional)
+          1000000000000000000000000, // attached deposit in yoctoNEAR (optional)
+        )
+
+        console.log('claim res: ', claimRes);
+
+        // const wallet = new nearApi.WalletConnection(near);
+        // const collectCoinsResp = await wallet.account().functionCall({
+        //   contractId: 'dinotoken.testnet',
+        //   methodName: 'claim',
+        //   args: {
+        //     receiver_id: window.accountId,
+        //     amount: String(coinsCollected),
+        //   },
+        //   gas: '300000000000000',
+        //   attachedDeposit: '1',
+        // });
+        // console.log('collectCoinsResp', collectCoinsResp);
+
+        // Once claimed, set toks in localstorage to 0
+        // const coinsCollected = window.localStorage.setItem('dinotoken', 0);
+      } catch (e) {
+        console.error('e: ', e);
+      }
+    })
 
       document.getElementById('cryptodino-storage-deposit').addEventListener('click', async () => {
         try {
