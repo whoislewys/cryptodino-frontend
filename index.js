@@ -2871,22 +2871,25 @@ function onDocumentLoad() {
       }
     })
 
-    document.getElementById('cryptodino-coins-collected').addEventListener('click', async () => {
+    document.getElementById('cryptodino-action-button-coins-collected').addEventListener('click', async () => {
         try {
-          console.log('nutsack04');
+          const coinsCollected = window.localStorage.getItem('dinotoken');
+          console.log('coins collected: ', coinsCollected);
           const wallet = new nearApi.WalletConnection(near);
           const collectCoinsResp = await wallet.account().functionCall({
             contractId: 'dinotoken.testnet',
-            methodName: 'ft_transfer',
+            methodName: 'claim',
             args: {
-              receiver_id: 'whoislewys.testnet',
-              amount: '1',
+              receiver_id: window.accountId,
+              amount: String(coinsCollected),
             },
             gas: '300000000000000',
             attachedDeposit: '1',
           });
           console.log('collectCoinsResp', collectCoinsResp);
 
+          // Once claimed, set toks in localstorage to 0
+          // const coinsCollected = window.localStorage.setItem('dinotoken', 0);
         } catch (e) {
           console.error('e: ', e);
         }
