@@ -2891,7 +2891,10 @@ function activateOptions() {
     })
 
     document.getElementById('equip').addEventListener('click', () => {
-        // TODO: setup equiping
+        // TODO: setup equipping
+        // Change hitboxes to helmet sprite boxes OR default boxes
+        // Change gravity if NFT type is astrohelmet
+
     })
 }
 
@@ -2912,8 +2915,10 @@ function setHatchingPrivledges() {
 function setEquipingPrivledges() {
     if (Runner.instance_.selectedItem && Runner.instance_.selectedItem.substring(0,4) === 'skin') {
         document.getElementById('equip').style.display = 'block'
+        document.getElementById('unequip').style.display = 'block'
     } else {
         document.getElementById('equip').style.display = 'none'
+        document.getElementById('unequip').style.display = 'none'
     }
 }
 

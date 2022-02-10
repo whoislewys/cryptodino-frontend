@@ -97,6 +97,11 @@ html, body {
   font-size: 0.55rem;
 }
 
+.inventory-options {
+  font-family: "Press Start 2P";
+  font-size: 0.55rem;
+}
+
 .popup {
   margin: 30px;
   padding: 10px;
