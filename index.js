@@ -56,6 +56,7 @@
 
         this.tokensCollected = parseInt(window.localStorage.getItem('dinotoken')) || 0;
         this.eggsCollected = parseInt(window.localStorage.getItem('dinoeggs')) || 0;
+        this.selectedEgg = null;
 
         // Sound FX.
         this.audioBuffer = null;
@@ -1543,8 +1544,9 @@
             minSpeed: 0,
             minGap: 150,
             collisionBoxes: [
-              // new CollisionBox(15, 15, 16, 5),
-              new CollisionBox(0, 0, 30, 30),
+                new CollisionBox(0, 0, 30, 30),
+                new CollisionBox(0, 0, 30, 30),
+                new CollisionBox(0, 0, 30, 30),
             ],
             numFrames: 1,
             frameRate: 1000/6,
@@ -2800,12 +2802,31 @@ function setEggs() {
     var numberOfEggs = parseInt(window.localStorage.getItem('dinoeggs'))
 
     let innerHTML = '';
-    for (let i = 0; i < numberOfEggs; i++) {
-      innerHTML += "<div class='inventory-slot'><img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/></div>"
+    for (let i = 0; i < Math.min(numberOfEggs, 5); i++) {
+      innerHTML = innerHTML + `
+        <label class='labl'>
+            <input type='radio' name='eggselection' value="egg${i}"/>
+            <div class='inventory-slot'>
+                <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
+            </div>
+        </label>
+        `
       
     }
     div.innerHTML = innerHTML;
-  }
+
+    document.getElementsByName('eggselection').addEventListener('click', () => {
+        var ele = document.getElementsByName('eggselection');
+              
+        for(i = 0; i < ele.length; i++) {
+            if (ele[i].checked) {
+                Runner.instance_.selectedEgg = ele[i].value
+            }
+        }
+    })
+          
+        
+  };
 
 function onDocumentLoad() {
   document.getElementById('cryptodino-coins-collected').innerHTML = parseInt(window.localStorage.getItem('dinotoken')) || 0;
@@ -2918,6 +2939,8 @@ function onDocumentLoad() {
         console.error('e: ', e);
       }
     })
+
+
 
     document.getElementById('cryptodino-action-button-coins-collected').addEventListener('click', async () => {
       try {
