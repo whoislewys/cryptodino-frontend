@@ -2891,7 +2891,10 @@ function activateOptions() {
     })
 
     document.getElementById('equip').addEventListener('click', () => {
-        // TODO: setup equiping
+        // TODO: setup equipping
+        // Change hitboxes to helmet sprite boxes OR default boxes
+        // Change gravity if NFT type is astrohelmet
+
     })
 }
 
@@ -2919,8 +2922,10 @@ function setEquipingPrivledges() {
         // && Runner.instance_.selectedItem === equippedSkin
     ) {
         document.getElementById('equip').style.display = 'block'
+        document.getElementById('unequip').style.display = 'block'
     } else {
         document.getElementById('equip').style.display = 'none'
+        document.getElementById('unequip').style.display = 'none'
     }
 }
 
