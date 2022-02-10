@@ -2899,6 +2899,8 @@ function setInventoryPrivledges() {
     setHatchingPrivledges()
     setEquipingPrivledges()
     setIncubationPrivledges()
+    setUnequipingPrivledges()
+    setUnincubatingPrivledges()
 }
 
 function setHatchingPrivledges() {
@@ -2915,6 +2917,22 @@ function setEquipingPrivledges() {
     } else {
         document.getElementById('equip').style.display = 'none'
     }
+}
+
+function setUnincubatingPrivledges() {
+    // if (Runner.instance_.selectedItem && Runner.instance_.selectedItem.substring(0,4) === 'skin') {
+    //     document.getElementById('equip').style.display = 'block'
+    // } else {
+    //     document.getElementById('equip').style.display = 'none'
+    // }
+}
+
+function setUnequipingPrivledges() {
+    // if (Runner.instance_.selectedItem && Runner.instance_.selectedItem.substring(0,4) === 'skin') {
+    //     document.getElementById('equip').style.display = 'block'
+    // } else {
+    //     document.getElementById('equip').style.display = 'none'
+    // }
 }
 
 function setIncubationPrivledges() {
