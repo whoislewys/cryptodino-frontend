@@ -55,7 +55,6 @@
         this.playCount = 0;
 
         this.tokensCollected = parseInt(window.localStorage.getItem('dinotoken')) || 0;
-        this.eggsCollected = parseInt(window.localStorage.getItem('dinoeggs')) || 0;
         this.selectedItem = null;
         this.lifetimeDistance = parseInt(window.localStorage.getItem('lifetimedistance')) || 0;
         this.incubationDistance = parseInt(window.localStorage.getItem('incubationdistance')) || 0;
@@ -601,7 +600,6 @@
                         window.localStorage.setItem('incubationPercentage', incubationPercentage);
                         document.getElementById('progress').style.width = `${incubationPercentage}%`
                     }
-                    setHatchingPrivledges()
 
                     if (this.currentSpeed < this.config.MAX_SPEED) {
                         this.currentSpeed += this.config.ACCELERATION;
@@ -816,7 +814,6 @@
          */
         gameOver: function () {
             window.localStorage.setItem('dinotoken', Runner.instance_.tokensCollected);
-            window.localStorage.setItem('dinoeggs', Runner.instance_.eggsCollected);
             window.localStorage.setItem('lifetimedistance', this.lifetimeDistance);
             window.localStorage.setItem('incubationdistance', this.incubationDistance);
             if (document.getElementById('progress')) {
@@ -1203,9 +1200,7 @@
                         obstacle.remove = true
                         return false
                     } else if (obstacle.typeConfig.type === 'DINOEGG') {
-                        Runner.instance_.eggsCollected += 1
-                        console.log('eggertons: ', Runner.instance_.eggsCollected)
-                        // TODO:  update ui with eggs collected later
+                        window.localStorage.setItem('dinoeggs', Math.min(window.localStorage.getItem('dinoeggs') + 1, 5));
                         obstacle.remove = true
                         return false
                     } else if (crashed) {
@@ -2866,6 +2861,7 @@ function setEggs() {
                 activateOptions()
             }
         }
+        setInventoryPrivledges()
     })         
 };
 
@@ -2874,6 +2870,13 @@ function activateOptions() {
 
     document.getElementById('incubate').addEventListener('click', () => {
         setIncubation(Runner.instance_.selectedItem)
+        const numberOfEggs = window.localStorage.getItem('dinoeggs')
+        for (let i = 0; i < numberOfEggs; i++) {
+            var eggId = `egg${i}`
+            if (eggId !== Runner.instance_.selectedItem) {
+                setUnincubation(eggId)
+            }
+        }
         window.localStorage.setItem('incubatingEgg', Runner.instance_.selectedItem);
     })
 
@@ -2886,6 +2889,16 @@ function activateOptions() {
     document.getElementById('hatch').addEventListener('click', () => {
         hatch(Runner.instance_.selectedItem)
     })
+
+    document.getElementById('equip').addEventListener('click', () => {
+        // TODO: setup equiping
+    })
+}
+
+function setInventoryPrivledges() {
+    setHatchingPrivledges()
+    setEquipingPrivledges()
+    setIncubationPrivledges()
 }
 
 function setHatchingPrivledges() {
@@ -2893,6 +2906,24 @@ function setHatchingPrivledges() {
         document.getElementById('hatch').style.display = 'block'
     } else {
         document.getElementById('hatch').style.display = 'none'
+    }
+}
+
+function setEquipingPrivledges() {
+    if (Runner.instance_.selectedItem && Runner.instance_.selectedItem.substring(0,4) === 'skin') {
+        document.getElementById('equip').style.display = 'block'
+    } else {
+        document.getElementById('equip').style.display = 'none'
+    }
+}
+
+function setIncubationPrivledges() {
+    if (Runner.instance_.selectedItem && 
+        Runner.instance_.selectedItem.substring(0,3) === 'egg'
+    ) {
+        document.getElementById('incubate').style.display = 'block'
+    } else {
+        document.getElementById('incubate').style.display = 'none'
     }
 }
 
@@ -2958,19 +2989,21 @@ function setNFTs() {
                 activateOptions()
             }
         }
+        setInventoryPrivledges()
     })
+    
 };
 
 function onDocumentLoad() {
   document.getElementById('cryptodino-coins-collected').innerHTML = parseInt(window.localStorage.getItem('dinotoken')) || 0;
   new Runner('.interstitial-wrapper');
   setEggs()
+  setNFTs()
 
   document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: ${Math.round(parseInt(Runner.instance_.lifetimeDistance) * 0.025)}`
   if (document.getElementById('progress')) {
       document.getElementById('progress').style.width = `${window.localStorage.getItem('incubationPercentage')}%`
   }
-  setHatchingPrivledges()
   /* Action Button Implementations / NEAR Integration
    * yooinked from
    * https://github.com/near-examples/wallet-example/blob/master/src/main.js
