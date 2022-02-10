@@ -54,11 +54,6 @@
 
         this.playCount = 0;
 
-        // DinoCrypto Additions
-        this.tokensCollected = parseInt(window.localStorage.getItem('dinoToken')) || 0;
-        this.selectedItem = null;
-        this.lifetimeDistance = parseInt(window.localStorage.getItem('lifetimeDistance')) || 0;
-
         // Sound FX.
         this.audioBuffer = null;
         this.soundFx = {};
@@ -585,8 +580,8 @@
 
                 if (!collision) {
                     this.distanceRan += this.currentSpeed * deltaTime / this.msPerFrame;
-                    Runner.instance_.lifetimeDistance = (parseInt(window.localStorage.getItem('lifetimeDistance')) || 0) + this.distanceRan
-                    document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: ${Math.round(parseInt(Runner.instance_.lifetimeDistance) * 0.025)}`
+                    var lifetimeDistance = (parseInt(window.localStorage.getItem('lifetimeDistance')) || 0) + this.distanceRan
+                    document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: ${Math.round(parseInt(lifetimeDistance) * 0.025)}`
 
                     var incubationDistance = (parseInt(window.localStorage.getItem('incubationDistance')) || 0) + this.distanceRan
                     if (document.getElementById('progress') && 
@@ -816,8 +811,7 @@
          * Game over state.
          */
         gameOver: function () {
-            window.localStorage.setItem('dinoToken', Runner.instance_.tokensCollected);
-            window.localStorage.setItem('lifetimeDistance', this.lifetimeDistance);
+            window.localStorage.setItem('lifetimeDistance', (parseInt(window.localStorage.getItem('lifetimeDistance')) || 0) + this.distanceRan);
             if (window.localStorage.getItem('incubatingEgg') && window.localStorage.getItem('incubatingEgg') !== 'null') {
                 console.log(555, !!window.localStorage.getItem('incubatingEgg'))
                 window.localStorage.setItem('incubationDistance', (parseInt(window.localStorage.getItem('incubationDistance')) || 0) + this.distanceRan);
@@ -1201,8 +1195,8 @@
                     }
 
                     if  (crashed && obstacle.typeConfig.type === 'DINOCOIN') {
-                        Runner.instance_.tokensCollected += 1
-                        document.getElementById('cryptodino-coins-collected').innerHTML = Runner.instance_.tokensCollected;
+                        window.localStorage.setItem('dinoToken', (parseInt(window.localStorage.getItem('dinoToken')) || 0) + 1 )
+                        document.getElementById('cryptodino-coins-collected').innerHTML = parseInt(window.localStorage.getItem('dinoToken')) || 0
                         obstacle.remove = true
                         return false
                     } else if (obstacle.typeConfig.type === 'DINOEGG') {
@@ -2869,7 +2863,7 @@ function setEggs() {
               
         for(i = 0; i < ele.length; i++) {
             if (ele[i].checked) {
-                Runner.instance_.selectedItem = ele[i].id
+                window.localStorage.setItem('selectedItem', ele[i].id)
                 activateOptions()
             }
         }
@@ -2881,25 +2875,26 @@ function activateOptions() {
     document.getElementById('action-buttons').style.display = 'flex'
 
     document.getElementById('incubate').addEventListener('click', () => {
-        setIncubation(Runner.instance_.selectedItem)
+        var selectedItem = window.localStorage.getItem('selectedItem')
+        setIncubation(selectedItem)
         const numberOfEggs = window.localStorage.getItem('dinoEggs')
         for (let i = 0; i < numberOfEggs; i++) {
             var eggId = `egg${i}`
-            if (eggId !== Runner.instance_.selectedItem) {
+            if (eggId !== selectedItem) {
                 setUnincubation(eggId)
             }
         }
-        window.localStorage.setItem('incubatingEgg', Runner.instance_.selectedItem);
+        window.localStorage.setItem('incubatingEgg', selectedItem);
     })
 
     document.getElementById('unincubate').addEventListener('click', () => {
-        setUnincubation(Runner.instance_.selectedItem)
+        setUnincubation(window.localStorage.getItem('selectedItem'))
         window.localStorage.setItem('incubatingEgg', null);
 
     })
 
     document.getElementById('hatch').addEventListener('click', () => {
-        hatch(Runner.instance_.selectedItem)
+        hatch(window.localStorage.getItem('selectedItem'))
     })
 
     document.getElementById('equip').addEventListener('click', () => {
@@ -2911,14 +2906,15 @@ function activateOptions() {
 }
 
 function setInventoryPrivledges() {
-    setHatchingPrivledges()
-    setEquipingPrivledges()
-    setIncubationPrivledges()
-    setUnequipingPrivledges()
-    setUnincubatingPrivledges()
+    const selectedItem = window.localStorage.getItem('selectedItem')
+    setHatchingPrivledges(selectedItem)
+    setEquipingPrivledges(selectedItem)
+    setIncubationPrivledges(selectedItem)
+    setUnequipingPrivledges(selectedItem)
+    setUnincubatingPrivledges(selectedItem)
 }
 
-function setHatchingPrivledges() {
+function setHatchingPrivledges(selectedItem) {
     if (window.localStorage.getItem('incubationPercentage') === '100') {
         document.getElementById('hatch').style.display = 'block'
     } else {
@@ -2926,12 +2922,12 @@ function setHatchingPrivledges() {
     }
 }
 
-function setEquipingPrivledges() {
+function setEquipingPrivledges(selectedItem) {
     // Change 'equippedSkin' to the name of the localstorage variable
     // const equippedSkin = window.localStorage.getItem('equippedSkin')
-    if (Runner.instance_.selectedItem &&
-        Runner.instance_.selectedItem.substring(0,4) === 'skin'
-        // && Runner.instance_.selectedItem === equippedSkin
+    if (selectedItem &&
+        selectedItem.substring(0,4) === 'skin'
+        // && selectedItem === equippedSkin
     ) {
         document.getElementById('equip').style.display = 'block'
     } else {
@@ -2939,34 +2935,30 @@ function setEquipingPrivledges() {
     }
 }
 
-function setUnincubatingPrivledges() {
+function setUnincubatingPrivledges(selectedItem) {
     const incubatingEgg = window.localStorage.getItem('incubatingEgg')
-    if (Runner.instance_.selectedItem &&
-        Runner.instance_.selectedItem === incubatingEgg
-    ) {
+    if (selectedItem && selectedItem === incubatingEgg) {
         document.getElementById('unincubate').style.display = 'block'
     } else {
         document.getElementById('unincubate').style.display = 'none'
     }
 }
 
-function setUnequipingPrivledges() {
+function setUnequipingPrivledges(selectedItem) {
     // Change 'equippedSkin' to the name of the localstorage variable
     const equippedSkin = window.localStorage.getItem('equippedSkin')
-    if (Runner.instance_.selectedItem &&
-        Runner.instance_.selectedItem === equippedSkin
-    ) {
+    if (selectedItem && selectedItem === equippedSkin) {
         document.getElementById('unequip').style.display = 'block'
     } else {
         document.getElementById('unequip').style.display = 'none'
     }
 }
 
-function setIncubationPrivledges() {
+function setIncubationPrivledges(selectedItem) {
     const incubatingEgg = window.localStorage.getItem('incubatingEgg')
-    if (Runner.instance_.selectedItem &&
-        Runner.instance_.selectedItem.substring(0,3) === 'egg' &&
-        Runner.instance_.selectedItem !== incubatingEgg
+    if (selectedItem &&
+        selectedItem.substring(0,3) === 'egg' &&
+        selectedItem !== incubatingEgg
     ) {
         document.getElementById('incubate').style.display = 'block'
     } else {
@@ -3047,7 +3039,7 @@ function setNFTs() {
               
         for(i = 0; i < ele.length; i++) {
             if (ele[i].checked) {
-                Runner.instance_.selectedItem = ele[i].id
+                window.localStorage.setItem('selectedItem', ele[i].id)
                 activateOptions()
             }
         }
@@ -3062,7 +3054,7 @@ function onDocumentLoad() {
   setEggs()
   setNFTs()
 
-  document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: ${Math.round(parseInt(Runner.instance_.lifetimeDistance) * 0.025)}`
+  document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: ${Math.round(parseInt(window.localStorage.getItem('lifetimeDistance') || 0 ) * 0.025)}`
   if (document.getElementById('progress')) {
       document.getElementById('progress').style.width = `${window.localStorage.getItem('incubationPercentage')}%`
   }
