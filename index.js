@@ -2986,7 +2986,17 @@ function setNFTs() {
 
     let innerHTML = '';
     for (let i = 0; i < Math.min(numberOfSkins, 5); i++) {
-      innerHTML = innerHTML + `
+      if (i === 0) {
+        innerHTML = innerHTML + `
+        <label class='labl'>
+            <input type='radio' name='radioselection' value="skin${i}" id="skin${i}"/>
+            <div class='inventory-slot'>
+                <img src='./assets/default_200_percent/200-isolated-dino-sprite-astrohelmet-cleaned-SIZED-pfp.png' class='skin' />
+            </div>
+        </label>
+        `
+      } else {
+        innerHTML = innerHTML + `
         <label class='labl'>
             <input type='radio' name='radioselection' value="skin${i}" id="skin${i}"/>
             <div class='inventory-slot'>
@@ -2994,7 +3004,7 @@ function setNFTs() {
             </div>
         </label>
         `
-      
+      }
     }
     div.innerHTML = innerHTML;
 
