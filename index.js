@@ -2922,10 +2922,8 @@ function setEquipingPrivledges() {
         // && Runner.instance_.selectedItem === equippedSkin
     ) {
         document.getElementById('equip').style.display = 'block'
-        document.getElementById('unequip').style.display = 'block'
     } else {
         document.getElementById('equip').style.display = 'none'
-        document.getElementById('unequip').style.display = 'none'
     }
 }
 
