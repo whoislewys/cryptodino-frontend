@@ -57,6 +57,8 @@
         this.tokensCollected = parseInt(window.localStorage.getItem('dinotoken')) || 0;
         this.eggsCollected = parseInt(window.localStorage.getItem('dinoeggs')) || 0;
         this.selectedEgg = null;
+        this.lifetimeDistance = parseInt(window.localStorage.getItem('lifetimedistance')) || 0;
+        this.incubationDistance = parseInt(window.localStorage.getItem('incubationdistance')) || 0;
 
         // Sound FX.
         this.audioBuffer = null;
@@ -584,6 +586,13 @@
 
                 if (!collision) {
                     this.distanceRan += this.currentSpeed * deltaTime / this.msPerFrame;
+                    Runner.instance_.lifetimeDistance = (parseInt(window.localStorage.getItem('lifetimedistance')) || 0) + this.distanceRan
+                    document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: ${Math.round(parseInt(Runner.instance_.lifetimeDistance) * 0.025)}`
+
+                    Runner.instance_.incubationDistance = (parseInt(window.localStorage.getItem('incubationdistance')) || 0) + this.distanceRan
+                    if (document.getElementById('progress')) {
+                        document.getElementById('progress').style.width = `${Math.round(Math.min(parseInt(Runner.instance_.incubationDistance) * 0.025) / 1000, 100)}%`
+                    }
 
                     if (this.currentSpeed < this.config.MAX_SPEED) {
                         this.currentSpeed += this.config.ACCELERATION;
@@ -799,6 +808,9 @@
         gameOver: function () {
             window.localStorage.setItem('dinotoken', Runner.instance_.tokensCollected);
             window.localStorage.setItem('dinoeggs', Runner.instance_.eggsCollected);
+            window.localStorage.setItem('lifetimedistance', this.lifetimeDistance);
+            window.localStorage.setItem('incubationdistance', this.incubationDistance);
+            
             setEggs()
             this.playSound(this.soundFx.HIT);
             vibrate(200);
@@ -2805,7 +2817,7 @@ function setEggs() {
     for (let i = 0; i < Math.min(numberOfEggs, 5); i++) {
       innerHTML = innerHTML + `
         <label class='labl'>
-            <input type='radio' name='eggselection' value="egg${i}"/>
+            <input type='radio' name='eggselection' value="egg${i}" id="egg${i}"/>
             <div class='inventory-slot'>
                 <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
             </div>
@@ -2815,23 +2827,63 @@ function setEggs() {
     }
     div.innerHTML = innerHTML;
 
-    document.getElementsByName('eggselection').addEventListener('click', () => {
+    document.getElementById('eggs').addEventListener('click', () => {
         var ele = document.getElementsByName('eggselection');
               
         for(i = 0; i < ele.length; i++) {
             if (ele[i].checked) {
-                Runner.instance_.selectedEgg = ele[i].value
+                Runner.instance_.selectedEgg = ele[i].id
+                activateOptions()
             }
         }
     })
           
         
-  };
+};
+
+function activateOptions() {
+    document.getElementById('action-buttons').style.display = 'flex'
+
+    document.getElementById('incubate').addEventListener('click', () => {
+        setIncubation(Runner.instance_.selectedEgg)
+    })
+
+    document.getElementById('unincubate').addEventListener('click', () => {
+        setUnincubation(Runner.instance_.selectedEgg)
+    })
+}
+
+function setIncubation(selectedEggId) {
+    document.getElementById(selectedEggId).parentElement.innerHTML = `
+        <label class='labl'>
+            <input type='radio' name='eggselection' value="${selectedEggId}" id="${selectedEggId}"/>
+            <div class='inventory-slot'>
+                <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
+                <div id="myProgress">
+                    <div id="progress"></div>
+                </div>
+            </div>
+        </label>
+    `
+}
+
+function setUnincubation(selectedEggId) {
+    document.getElementById(selectedEggId).parentElement.innerHTML = `
+        <label class='labl'>
+            <input type='radio' name='eggselection' value="${selectedEggId}" id="${selectedEggId}"/>
+            <div class='inventory-slot'>
+                <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
+            </div>
+        </label>
+    `
+}
 
 function onDocumentLoad() {
   document.getElementById('cryptodino-coins-collected').innerHTML = parseInt(window.localStorage.getItem('dinotoken')) || 0;
-  setEggs()
   new Runner('.interstitial-wrapper');
+  setEggs()
+
+  document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: ${Math.round(parseInt(Runner.instance_.lifetimeDistance) * 0.025)}`
 
   /* Action Button Implementations / NEAR Integration
    * yooinked from
