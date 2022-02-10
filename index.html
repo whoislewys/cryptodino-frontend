@@ -90,10 +90,10 @@
                 You dont have any eggs
               </div>
               <div class='text'>NFTs</div>
-              <div class='inventory-slot-set'>
-                <div class='inventory-slot'></div>
-                <div class='inventory-slot'></div>
-                <div class='inventory-slot'></div>
+              <div class='inventory-slot-set' id='skins'>
+                <div class='inventory-slot'><img class='nft-pfp' src='./assets/default_200_percent/200-isolated-dino-sprite-cowboy-hat-cleaned-SIZED-pfp.png'></img></div>
+                <div class='inventory-slot'><img class='nft-pfp' src='./assets/default_200_percent/200-isolated-dino-sprite-cowboy-hat-cleaned-SIZED-pfp.png'></img></div>
+                <div class='inventory-slot'><img class='nft-pfp' src='./assets/default_200_percent/200-isolated-dino-sprite-cowboy-hat-cleaned-SIZED-pfp.png'></img></div>
                 <div class='inventory-slot'></div>
                 <div class='inventory-slot'></div>
               </div>
@@ -131,6 +131,7 @@
     if (evt.keyCode == 32) {
         var box = document.getElementById("messageBox");
         box.style.visibility="hidden";
+        evt.preventDefault();
     }
 };
 </script>
