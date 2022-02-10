@@ -2912,7 +2912,12 @@ function setHatchingPrivledges() {
 }
 
 function setEquipingPrivledges() {
-    if (Runner.instance_.selectedItem && Runner.instance_.selectedItem.substring(0,4) === 'skin') {
+    // Change 'equippedSkin' to the name of the localstorage variable
+    // const equippedSkin = window.localStorage.getItem('equippedSkin')
+    if (Runner.instance_.selectedItem && 
+        Runner.instance_.selectedItem.substring(0,4) === 'skin' 
+        // && Runner.instance_.selectedItem === equippedSkin
+    ) {
         document.getElementById('equip').style.display = 'block'
     } else {
         document.getElementById('equip').style.display = 'none'
@@ -2920,24 +2925,33 @@ function setEquipingPrivledges() {
 }
 
 function setUnincubatingPrivledges() {
-    // if (Runner.instance_.selectedItem && Runner.instance_.selectedItem.substring(0,4) === 'skin') {
-    //     document.getElementById('equip').style.display = 'block'
-    // } else {
-    //     document.getElementById('equip').style.display = 'none'
-    // }
+    const incubatingEgg = window.localStorage.getItem('incubatingEgg')
+    if (Runner.instance_.selectedItem && 
+        Runner.instance_.selectedItem === incubatingEgg
+    ) {
+        document.getElementById('unincubate').style.display = 'block'
+    } else {
+        document.getElementById('unincubate').style.display = 'none'
+    }
 }
 
 function setUnequipingPrivledges() {
-    // if (Runner.instance_.selectedItem && Runner.instance_.selectedItem.substring(0,4) === 'skin') {
-    //     document.getElementById('equip').style.display = 'block'
-    // } else {
-    //     document.getElementById('equip').style.display = 'none'
-    // }
+    // Change 'equippedSkin' to the name of the localstorage variable
+    const equippedSkin = window.localStorage.getItem('equippedSkin')
+    if (Runner.instance_.selectedItem && 
+        Runner.instance_.selectedItem === equippedSkin
+    ) {
+        document.getElementById('unequip').style.display = 'block'
+    } else {
+        document.getElementById('unequip').style.display = 'none'
+    }
 }
 
 function setIncubationPrivledges() {
+    const incubatingEgg = window.localStorage.getItem('incubatingEgg')
     if (Runner.instance_.selectedItem && 
-        Runner.instance_.selectedItem.substring(0,3) === 'egg'
+        Runner.instance_.selectedItem.substring(0,3) === 'egg' &&
+        Runner.instance_.selectedItem !== incubatingEgg
     ) {
         document.getElementById('incubate').style.display = 'block'
     } else {
@@ -2946,6 +2960,7 @@ function setIncubationPrivledges() {
 }
 
 function setIncubation(selectedEggId) {
+    window.localStorage.setItem('incubatingEgg', selectedEggId)
     document.getElementById(selectedEggId).parentElement.innerHTML = `
         <label class='labl'>
             <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}"/>
@@ -2960,6 +2975,7 @@ function setIncubation(selectedEggId) {
 }
 
 function setUnincubation(selectedEggId) {
+    window.localStorage.setItem('incubatingEgg', null)
     document.getElementById(selectedEggId).parentElement.innerHTML = `
         <label class='labl'>
             <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}"/>
