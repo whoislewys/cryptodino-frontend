@@ -132,8 +132,12 @@ html, body {
   display: none;
 }
 
+#unequip {
+  display: none;
+}
+
 #incubate {
-  display: block;
+  display: none;
 }
 
 #unincubate {
