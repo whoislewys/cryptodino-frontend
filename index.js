@@ -1619,9 +1619,9 @@
         DROP_VELOCITY: -5,
         GRAVITY: 0.6,
         // OG Sprite Height
-        // HEIGHT: 47,
+        HEIGHT: 47,
         // Cowboy hat height
-        HEIGHT: 57,
+        // HEIGHT: 57,
         HEIGHT_DUCK: 25,
         INIITAL_JUMP_VELOCITY: -10,
         INTRO_DURATION: 1500,
@@ -1629,11 +1629,14 @@
         MIN_JUMP_HEIGHT: 30,
         SPEED_DROP_COEFFICIENT: 3,
         // OG Sprite width
-        // SPRITE_WIDTH: 262,
+        SPRITE_WIDTH: 262,
         // Cowboy hat width
-        SPRITE_WIDTH: 281,
+        // SPRITE_WIDTH: 281,
         START_X_POS: 50,
-        WIDTH: 47,
+        // OG WIDTH
+        WIDTH: 44,
+        // Cowboy hat width
+        // WIDTH: 47,
         WIDTH_DUCK: 59
     };
 
@@ -1683,23 +1686,23 @@
     Trex.animFrames = {
         WAITING: {
             // OG sprite frames
-            // frames: [44, 0],
+            frames: [44, 0],
             // Cowboy Hat Sprite Frames
-            frames: [47, 0],
+            // frames: [47, 0],
             msPerFrame: 1000 / 3
         },
         RUNNING: {
             // OG sprite frames
-            // frames: [88, 132],
+            frames: [88, 132],
             // Cowboy Hat Sprite Frames
-            frames: [94, 141],
+            // frames: [94, 141],
             msPerFrame: 1000 / 12
         },
         CRASHED: {
             // OG sprite frames
-            // frames: [220],
+            frames: [220],
             // Cowboy Hat Sprite Frames
-            frames: [238],
+            // frames: [238],
             msPerFrame: 1000 / 60
         },
         JUMPING: {
@@ -1707,7 +1710,10 @@
             msPerFrame: 1000 / 60
         },
         DUCKING: {
-            frames: [285, 347],
+            // OG sprite frames
+            frames: [264, 323],
+            // Cowboy Hat Sprite Frames
+            // frames: [285, 347],
             msPerFrame: 1000 / 8
         }
     };
@@ -2917,8 +2923,8 @@ function setHatchingPrivledges() {
 function setEquipingPrivledges() {
     // Change 'equippedSkin' to the name of the localstorage variable
     // const equippedSkin = window.localStorage.getItem('equippedSkin')
-    if (Runner.instance_.selectedItem && 
-        Runner.instance_.selectedItem.substring(0,4) === 'skin' 
+    if (Runner.instance_.selectedItem &&
+        Runner.instance_.selectedItem.substring(0,4) === 'skin'
         // && Runner.instance_.selectedItem === equippedSkin
     ) {
         document.getElementById('equip').style.display = 'block'
@@ -2929,7 +2935,7 @@ function setEquipingPrivledges() {
 
 function setUnincubatingPrivledges() {
     const incubatingEgg = window.localStorage.getItem('incubatingEgg')
-    if (Runner.instance_.selectedItem && 
+    if (Runner.instance_.selectedItem &&
         Runner.instance_.selectedItem === incubatingEgg
     ) {
         document.getElementById('unincubate').style.display = 'block'
@@ -2941,7 +2947,7 @@ function setUnincubatingPrivledges() {
 function setUnequipingPrivledges() {
     // Change 'equippedSkin' to the name of the localstorage variable
     const equippedSkin = window.localStorage.getItem('equippedSkin')
-    if (Runner.instance_.selectedItem && 
+    if (Runner.instance_.selectedItem &&
         Runner.instance_.selectedItem === equippedSkin
     ) {
         document.getElementById('unequip').style.display = 'block'
@@ -2952,7 +2958,7 @@ function setUnequipingPrivledges() {
 
 function setIncubationPrivledges() {
     const incubatingEgg = window.localStorage.getItem('incubatingEgg')
-    if (Runner.instance_.selectedItem && 
+    if (Runner.instance_.selectedItem &&
         Runner.instance_.selectedItem.substring(0,3) === 'egg' &&
         Runner.instance_.selectedItem !== incubatingEgg
     ) {
