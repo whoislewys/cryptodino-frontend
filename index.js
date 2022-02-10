@@ -2817,7 +2817,7 @@ function onDocumentLoad() {
       {
         // name of contract you're connecting to
         viewMethods: ['nft_token'], // view methods do not change state but usually return a value
-        changeMethods: ['nft_transfer'], // change methods modify state
+        changeMethods: ['nft_transfer','storage_deposit'], // change methods modify state
         sender: acct, // account object to initialize and sign transactions.
       }
     );
@@ -2841,12 +2841,20 @@ function onDocumentLoad() {
       console.log('clicked login')
       window.walletAccount.requestSignIn(
         // The contract name that would be authorized to be called by the user's account.
-        'dinotoken.testnet',
+        'dinonft.testnet',
         // This is the app name. It can be anything.
         'CryptoDino',
         // We can also provide URLs to redirect on success and failure.
         // The current URL is used by default.
       );
+    //   window.walletAccount.requestSignIn(
+    //     // The contract name that would be authorized to be called by the user's account.
+    //     'dinonft.testnet',
+    //     // This is the app name. It can be anything.
+    //     'CryptoDinoNFT',
+    //     // We can also provide URLs to redirect on success and failure.
+    //     // The current URL is used by default.
+    //   );
     });
 
     // TODO: i think also sign into dinonft.testnet here?
@@ -2895,6 +2903,26 @@ function onDocumentLoad() {
       document.getElementById('cryptodino-storage-deposit').addEventListener('click', async () => {
         try {
           const storageDepositResp = await window.contract.storage_deposit({ account_id: window.accountId, amount: 0.00235 });
+          console.log('storage deposit resp: ', storageDepositResp);
+        } catch (e) {
+          console.error('e: ', e);
+        }
+      })
+
+      document.getElementById('cryptodino-nft-storage-deposit').addEventListener('click', async () => {
+        try {
+            console.log(23, window.accountId)
+          const storageDepositResp = await window.nftContract.storage_deposit({ account_id: window.accountId, amount: 0.00235 });
+          console.log('storage deposit resp: ', storageDepositResp);
+        } catch (e) {
+          console.error('e: ', e);
+        }
+      })
+
+      document.getElementById('cryptodino-see-nfts').addEventListener('click', async () => {
+        try {
+            console.log(22, window.nftContract)
+          const storageDepositResp = await window.nftContract.nft_token({ token_id: window.nftContract.contractId });
           console.log('storage deposit resp: ', storageDepositResp);
         } catch (e) {
           console.error('e: ', e);
