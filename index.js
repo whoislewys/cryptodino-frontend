@@ -54,10 +54,10 @@
 
         this.playCount = 0;
 
-        this.tokensCollected = parseInt(window.localStorage.getItem('dinotoken')) || 0;
+        // DinoCrypto Additions
+        this.tokensCollected = parseInt(window.localStorage.getItem('dinoToken')) || 0;
         this.selectedItem = null;
-        this.lifetimeDistance = parseInt(window.localStorage.getItem('lifetimedistance')) || 0;
-        this.incubationDistance = parseInt(window.localStorage.getItem('incubationdistance')) || 0;
+        this.lifetimeDistance = parseInt(window.localStorage.getItem('lifetimeDistance')) || 0;
 
         // Sound FX.
         this.audioBuffer = null;
@@ -585,15 +585,18 @@
 
                 if (!collision) {
                     this.distanceRan += this.currentSpeed * deltaTime / this.msPerFrame;
-                    Runner.instance_.lifetimeDistance = (parseInt(window.localStorage.getItem('lifetimedistance')) || 0) + this.distanceRan
+                    Runner.instance_.lifetimeDistance = (parseInt(window.localStorage.getItem('lifetimeDistance')) || 0) + this.distanceRan
                     document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: ${Math.round(parseInt(Runner.instance_.lifetimeDistance) * 0.025)}`
 
-                    Runner.instance_.incubationDistance = (parseInt(window.localStorage.getItem('incubationdistance')) || 0) + this.distanceRan
-                    if (document.getElementById('progress')) {
+                    var incubationDistance = (parseInt(window.localStorage.getItem('incubationDistance')) || 0) + this.distanceRan
+                    if (document.getElementById('progress') && 
+                        window.localStorage.getItem('incubatingEgg') && 
+                        window.localStorage.getItem('incubatingEgg') !== 'null'
+                    ) {
                         var incubationPercentage = Math.round(
                             Math.min(
                                 parseInt(
-                                    Runner.instance_.incubationDistance
+                                    incubationDistance
                                 ) * 0.0025, 100
                             )
                         )
@@ -813,9 +816,12 @@
          * Game over state.
          */
         gameOver: function () {
-            window.localStorage.setItem('dinotoken', Runner.instance_.tokensCollected);
-            window.localStorage.setItem('lifetimedistance', this.lifetimeDistance);
-            window.localStorage.setItem('incubationdistance', this.incubationDistance);
+            window.localStorage.setItem('dinoToken', Runner.instance_.tokensCollected);
+            window.localStorage.setItem('lifetimeDistance', this.lifetimeDistance);
+            if (window.localStorage.getItem('incubatingEgg') && window.localStorage.getItem('incubatingEgg') !== 'null') {
+                console.log(555, !!window.localStorage.getItem('incubatingEgg'))
+                window.localStorage.setItem('incubationDistance', (parseInt(window.localStorage.getItem('incubationDistance')) || 0) + this.distanceRan);
+            }
             if (document.getElementById('progress')) {
                 document.getElementById('progress').style.width = `${window.localStorage.getItem('incubationPercentage')}%`
             }
@@ -1200,7 +1206,7 @@
                         obstacle.remove = true
                         return false
                     } else if (obstacle.typeConfig.type === 'DINOEGG') {
-                        window.localStorage.setItem('dinoeggs', Math.min(window.localStorage.getItem('dinoeggs') + 1, 5));
+                        window.localStorage.setItem('dinoEggs', Math.min(window.localStorage.getItem('dinoEggs') + 1, 5));
                         obstacle.remove = true
                         return false
                     } else if (crashed) {
@@ -2817,7 +2823,7 @@
 
 function setEggs() {
     var div = document.getElementById('eggs');
-    var numberOfEggs = parseInt(window.localStorage.getItem('dinoeggs')) || 0
+    var numberOfEggs = parseInt(window.localStorage.getItem('dinoEggs')) || 0
 
     let innerHTML = '';
     if (numberOfEggs === 0) {
@@ -2870,7 +2876,7 @@ function activateOptions() {
 
     document.getElementById('incubate').addEventListener('click', () => {
         setIncubation(Runner.instance_.selectedItem)
-        const numberOfEggs = window.localStorage.getItem('dinoeggs')
+        const numberOfEggs = window.localStorage.getItem('dinoEggs')
         for (let i = 0; i < numberOfEggs; i++) {
             var eggId = `egg${i}`
             if (eggId !== Runner.instance_.selectedItem) {
@@ -2990,10 +2996,10 @@ function setUnincubation(selectedEggId) {
 }
 
 function hatch(selectedEggId) {
-    window.localStorage.setItem('incubationdistance', 0);
+    window.localStorage.setItem('incubationDistance', 0);
     window.localStorage.setItem('incubationPercentage', 0);
     document.getElementById('progress').style.width = `0%`
-    window.localStorage.setItem('dinoeggs', window.localStorage.getItem('dinoeggs') - 1)
+    window.localStorage.setItem('dinoEggs', window.localStorage.getItem('dinoEggs') - 1)
     window.localStorage.setItem('dinoNfts', (parseInt(window.localStorage.getItem('dinoNfts')) || 0) + 1)
     setNFTs()
     setUnincubation(selectedEggId)
@@ -3001,9 +3007,12 @@ function hatch(selectedEggId) {
 
 function setNFTs() {
     var div = document.getElementById('skins');
-    var numberOfSkins= parseInt(window.localStorage.getItem('dinoNfts'))
+    var numberOfSkins= parseInt(window.localStorage.getItem('dinoNfts')) || 0
 
     let innerHTML = '';
+    if (numberOfSkins === 0) {
+        innerHTML = '<div>You dont have any skins yet</div>'
+    }
     for (let i = 0; i < Math.min(numberOfSkins, 5); i++) {
       if (i === 0) {
         innerHTML = innerHTML + `
@@ -3042,7 +3051,7 @@ function setNFTs() {
 };
 
 function onDocumentLoad() {
-  document.getElementById('cryptodino-coins-collected').innerHTML = parseInt(window.localStorage.getItem('dinotoken')) || 0;
+  document.getElementById('cryptodino-coins-collected').innerHTML = parseInt(window.localStorage.getItem('dinoToken')) || 0;
   new Runner('.interstitial-wrapper');
   setEggs()
   setNFTs()
@@ -3162,7 +3171,7 @@ function onDocumentLoad() {
 
     document.getElementById('cryptodino-action-button-coins-collected').addEventListener('click', async () => {
       try {
-        const coinsCollected = window.localStorage.getItem('dinotoken');
+        const coinsCollected = window.localStorage.getItem('dinoToken');
         console.log('coins collected: ', coinsCollected);
 
         const claimRes = await window.contract.claim({
@@ -3189,7 +3198,7 @@ function onDocumentLoad() {
         // console.log('collectCoinsResp', collectCoinsResp);
 
         // Once claimed, set toks in localstorage to 0
-        // const coinsCollected = window.localStorage.setItem('dinotoken', 0);
+        // const coinsCollected = window.localStorage.setItem('dinoToken', 0);
       } catch (e) {
         console.error('e: ', e);
       }
