@@ -2860,9 +2860,7 @@ function setEggs() {
                 activateOptions()
             }
         }
-    })
-          
-        
+    })         
 };
 
 function activateOptions() {
@@ -2904,6 +2902,37 @@ function setUnincubation(selectedEggId) {
         </label>
     `
 }
+
+function setNFTs() {
+    // TODO: implement
+    var div = document.getElementById('skins');
+    var numberOfSkins= parseInt(window.localStorage.getItem('dinoNfts'))
+
+    let innerHTML = '';
+    for (let i = 0; i < Math.min(numberOfEggs, 5); i++) {
+      innerHTML = innerHTML + `
+        <label class='labl'>
+            <input type='radio' name='eggselection' value="egg${i}" id="egg${i}"/>
+            <div class='inventory-slot'>
+                <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
+            </div>
+        </label>
+        `
+      
+    }
+    div.innerHTML = innerHTML;
+
+    document.getElementById('eggs').addEventListener('click', () => {
+        var ele = document.getElementsByName('eggselection');
+              
+        for(i = 0; i < ele.length; i++) {
+            if (ele[i].checked) {
+                Runner.instance_.selectedEgg = ele[i].id
+                activateOptions()
+            }
+        }
+    })
+};
 
 function onDocumentLoad() {
   document.getElementById('cryptodino-coins-collected').innerHTML = parseInt(window.localStorage.getItem('dinotoken')) || 0;
