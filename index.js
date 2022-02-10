@@ -55,6 +55,7 @@
         this.playCount = 0;
 
         this.tokensCollected = parseInt(window.localStorage.getItem('dinotoken')) || 0;
+        this.eggsCollected = parseInt(window.localStorage.getItem('dinoeggs')) || 0;
 
         // Sound FX.
         this.audioBuffer = null;
@@ -172,6 +173,7 @@
             RESTART: { x: 2, y: 2 },
             TEXT_SPRITE: { x: 655, y: 2 },
             DINOCOIN: { x: 1231, y: 2 },
+            DINOEGG: { x: 1146, y: 26 },
             // TREX: { x: 848, y: 2 },
             STAR: { x: 645, y: 2 }
         },
@@ -185,6 +187,7 @@
             RESTART: { x: 2, y: 2 },
             TEXT_SPRITE: { x: 1294, y: 2 },
             DINOCOIN: { x: 2441, y: 2 },
+            DINOEGG: { x: 2441, y: 39 },
             // TREX: { x: 1678, y: 2 },
             STAR: { x: 1276, y: 2 }
         }
@@ -794,6 +797,8 @@
          */
         gameOver: function () {
             window.localStorage.setItem('dinotoken', Runner.instance_.tokensCollected);
+            window.localStorage.setItem('dinoeggs', Runner.instance_.eggsCollected);
+            setEggs()
             this.playSound(this.soundFx.HIT);
             vibrate(200);
 
@@ -1168,9 +1173,15 @@
                         drawCollisionBoxes(opt_canvasCtx, adjTrexBox, adjObstacleBox);
                     }
 
-                    if  (crashed && obstacle.typeConfig.type === 'DINOCOIN' ) {
+                    if  (crashed && obstacle.typeConfig.type === 'DINOCOIN') {
                         Runner.instance_.tokensCollected += 1
                         document.getElementById('cryptodino-coins-collected').innerHTML = Runner.instance_.tokensCollected;
+                        obstacle.remove = true
+                        return false
+                    } else if (obstacle.typeConfig.type === 'DINOEGG') {
+                        Runner.instance_.eggsCollected += 1
+                        console.log('eggertons: ', Runner.instance_.eggsCollected)
+                        // TODO:  update ui with eggs collected later
                         obstacle.remove = true
                         return false
                     } else if (crashed) {
@@ -1520,6 +1531,22 @@
               // TO DO: update this collision box... theres still something funky going on here
             ],
             numFrames: 12,
+            frameRate: 1000/6,
+            speedOffset: .8
+        },
+        {
+            type: 'DINOEGG',
+            width: 20, // width in 2x spritesheet must be 36
+            height: 24, // similarly, height of 40 per coin
+            yPos: 112,
+            multipleSpeed: 7,
+            minSpeed: 0,
+            minGap: 150,
+            collisionBoxes: [
+              // new CollisionBox(15, 15, 16, 5),
+              new CollisionBox(0, 0, 30, 30),
+            ],
+            numFrames: 1,
             frameRate: 1000/6,
             speedOffset: .8
         },
@@ -2768,8 +2795,21 @@
     };
 })();
 
+function setEggs() {
+    var div = document.getElementById('eggs');
+    var numberOfEggs = parseInt(window.localStorage.getItem('dinoeggs'))
+
+    let innerHTML = '';
+    for (let i = 0; i < numberOfEggs; i++) {
+      innerHTML += "<div class='inventory-slot'><img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/></div>"
+      
+    }
+    div.innerHTML = innerHTML;
+  }
+
 function onDocumentLoad() {
   document.getElementById('cryptodino-coins-collected').innerHTML = parseInt(window.localStorage.getItem('dinotoken')) || 0;
+  setEggs()
   new Runner('.interstitial-wrapper');
 
   /* Action Button Implementations / NEAR Integration
@@ -2806,7 +2846,7 @@ function onDocumentLoad() {
       {
         // name of contract you're connecting to
         viewMethods: ['ft_balance_of'], // view methods do not change state but usually return a value
-        changeMethods: ['ft_transfer','storage_deposit'], // change methods modify state
+        changeMethods: ['ft_transfer','storage_deposit', 'claim'], // change methods modify state
         sender: acct, // account object to initialize and sign transactions.
       }
     );
@@ -2879,26 +2919,40 @@ function onDocumentLoad() {
       }
     })
 
-    document.getElementById('cryptodino-coins-collected').addEventListener('click', async () => {
-        try {
-          console.log('nutsack04');
-          const wallet = new nearApi.WalletConnection(near);
-          const collectCoinsResp = await wallet.account().functionCall({
-            contractId: 'dinotoken.testnet',
-            methodName: 'ft_transfer',
-            args: {
-              receiver_id: 'whoislewys.testnet',
-              amount: '1',
-            },
-            gas: '300000000000000',
-            attachedDeposit: '1',
-          });
-          console.log('collectCoinsResp', collectCoinsResp);
+    document.getElementById('cryptodino-action-button-coins-collected').addEventListener('click', async () => {
+      try {
+        const coinsCollected = window.localStorage.getItem('dinotoken');
+        console.log('coins collected: ', coinsCollected);
 
-        } catch (e) {
-          console.error('e: ', e);
-        }
-      })
+        const claimRes = await window.contract.claim({
+          receiver_id: window.accountId,
+          amount: String(coinsCollected),
+        },
+          300000000000000, // attached GAS (optional)
+          1000000000000000000000000, // attached deposit in yoctoNEAR (optional)
+        )
+
+        console.log('claim res: ', claimRes);
+
+        // const wallet = new nearApi.WalletConnection(near);
+        // const collectCoinsResp = await wallet.account().functionCall({
+        //   contractId: 'dinotoken.testnet',
+        //   methodName: 'claim',
+        //   args: {
+        //     receiver_id: window.accountId,
+        //     amount: String(coinsCollected),
+        //   },
+        //   gas: '300000000000000',
+        //   attachedDeposit: '1',
+        // });
+        // console.log('collectCoinsResp', collectCoinsResp);
+
+        // Once claimed, set toks in localstorage to 0
+        // const coinsCollected = window.localStorage.setItem('dinotoken', 0);
+      } catch (e) {
+        console.error('e: ', e);
+      }
+    })
 
       document.getElementById('cryptodino-storage-deposit').addEventListener('click', async () => {
         try {
