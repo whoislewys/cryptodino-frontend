@@ -591,7 +591,15 @@
 
                     Runner.instance_.incubationDistance = (parseInt(window.localStorage.getItem('incubationdistance')) || 0) + this.distanceRan
                     if (document.getElementById('progress')) {
-                        document.getElementById('progress').style.width = `${Math.round(Math.min(parseInt(Runner.instance_.incubationDistance) * 0.025) / 1000, 100)}%`
+                        var incubationPercentage = Math.round(
+                            Math.min(
+                                parseInt(
+                                    Runner.instance_.incubationDistance
+                                ) * 0.0025, 100
+                            )
+                        )
+                        window.localStorage.setItem('incubationPercentage', incubationPercentage);
+                        document.getElementById('progress').style.width = `${incubationPercentage}%`
                     }
 
                     if (this.currentSpeed < this.config.MAX_SPEED) {
@@ -2815,14 +2823,30 @@ function setEggs() {
 
     let innerHTML = '';
     for (let i = 0; i < Math.min(numberOfEggs, 5); i++) {
-      innerHTML = innerHTML + `
-        <label class='labl'>
-            <input type='radio' name='eggselection' value="egg${i}" id="egg${i}"/>
-            <div class='inventory-slot'>
-                <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
-            </div>
-        </label>
-        `
+        selectedEggId = window.localStorage.getItem('incubatingEgg')
+        if (selectedEggId === `egg${i}`) {
+            innerHTML = innerHTML + `
+                <label class='labl'>
+                    <input type='radio' name='eggselection' value="${selectedEggId}" id="${selectedEggId}"/>
+                    <div class='inventory-slot'>
+                        <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
+                        <div id="myProgress">
+                            <div id="progress"></div>
+                        </div>
+                    </div>
+                </label>
+            `
+        } else {
+            innerHTML = innerHTML + `
+                <label class='labl'>
+                    <input type='radio' name='eggselection' value="egg${i}" id="egg${i}"/>
+                    <div class='inventory-slot'>
+                        <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
+                    </div>
+                </label>
+            `
+        }
+      
       
     }
     div.innerHTML = innerHTML;
@@ -2846,10 +2870,13 @@ function activateOptions() {
 
     document.getElementById('incubate').addEventListener('click', () => {
         setIncubation(Runner.instance_.selectedEgg)
+        window.localStorage.setItem('incubatingEgg', Runner.instance_.selectedEgg);
     })
 
     document.getElementById('unincubate').addEventListener('click', () => {
         setUnincubation(Runner.instance_.selectedEgg)
+        window.localStorage.setItem('incubatingEgg', null);
+
     })
 }
 
@@ -2884,6 +2911,7 @@ function onDocumentLoad() {
   setEggs()
 
   document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: ${Math.round(parseInt(Runner.instance_.lifetimeDistance) * 0.025)}`
+  document.getElementById('progress').style.width = `${window.localStorage.getItem('incubationPercentage')}%`
 
   /* Action Button Implementations / NEAR Integration
    * yooinked from
