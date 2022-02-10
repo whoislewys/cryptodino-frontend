@@ -56,7 +56,7 @@
 
         this.tokensCollected = parseInt(window.localStorage.getItem('dinotoken')) || 0;
         this.eggsCollected = parseInt(window.localStorage.getItem('dinoeggs')) || 0;
-        this.selectedEgg = null;
+        this.selectedItem = null;
         this.lifetimeDistance = parseInt(window.localStorage.getItem('lifetimedistance')) || 0;
         this.incubationDistance = parseInt(window.localStorage.getItem('incubationdistance')) || 0;
 
@@ -601,6 +601,7 @@
                         window.localStorage.setItem('incubationPercentage', incubationPercentage);
                         document.getElementById('progress').style.width = `${incubationPercentage}%`
                     }
+                    setHatchingPrivledges()
 
                     if (this.currentSpeed < this.config.MAX_SPEED) {
                         this.currentSpeed += this.config.ACCELERATION;
@@ -818,7 +819,9 @@
             window.localStorage.setItem('dinoeggs', Runner.instance_.eggsCollected);
             window.localStorage.setItem('lifetimedistance', this.lifetimeDistance);
             window.localStorage.setItem('incubationdistance', this.incubationDistance);
-            
+            if (document.getElementById('progress')) {
+                document.getElementById('progress').style.width = `${window.localStorage.getItem('incubationPercentage')}%`
+            }
             setEggs()
             this.playSound(this.soundFx.HIT);
             vibrate(200);
@@ -2819,15 +2822,18 @@
 
 function setEggs() {
     var div = document.getElementById('eggs');
-    var numberOfEggs = parseInt(window.localStorage.getItem('dinoeggs'))
+    var numberOfEggs = parseInt(window.localStorage.getItem('dinoeggs')) || 0
 
     let innerHTML = '';
+    if (numberOfEggs === 0) {
+        innerHTML = '<div>You dont have any eggs yet</div>'
+    }
     for (let i = 0; i < Math.min(numberOfEggs, 5); i++) {
-        selectedEggId = window.localStorage.getItem('incubatingEgg')
-        if (selectedEggId === `egg${i}`) {
+        incubatedEggId = window.localStorage.getItem('incubatingEgg')
+        if (incubatedEggId === `egg${i}`) {
             innerHTML = innerHTML + `
                 <label class='labl'>
-                    <input type='radio' name='eggselection' value="${selectedEggId}" id="${selectedEggId}"/>
+                    <input type='radio' name='radioselection' value="${incubatedEggId}" id="${incubatedEggId}"/>
                     <div class='inventory-slot'>
                         <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
                         <div id="myProgress">
@@ -2839,7 +2845,7 @@ function setEggs() {
         } else {
             innerHTML = innerHTML + `
                 <label class='labl'>
-                    <input type='radio' name='eggselection' value="egg${i}" id="egg${i}"/>
+                    <input type='radio' name='radioselection' value="egg${i}" id="egg${i}"/>
                     <div class='inventory-slot'>
                         <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
                     </div>
@@ -2852,11 +2858,11 @@ function setEggs() {
     div.innerHTML = innerHTML;
 
     document.getElementById('eggs').addEventListener('click', () => {
-        var ele = document.getElementsByName('eggselection');
+        var ele = document.getElementsByName('radioselection');
               
         for(i = 0; i < ele.length; i++) {
             if (ele[i].checked) {
-                Runner.instance_.selectedEgg = ele[i].id
+                Runner.instance_.selectedItem = ele[i].id
                 activateOptions()
             }
         }
@@ -2867,21 +2873,33 @@ function activateOptions() {
     document.getElementById('action-buttons').style.display = 'flex'
 
     document.getElementById('incubate').addEventListener('click', () => {
-        setIncubation(Runner.instance_.selectedEgg)
-        window.localStorage.setItem('incubatingEgg', Runner.instance_.selectedEgg);
+        setIncubation(Runner.instance_.selectedItem)
+        window.localStorage.setItem('incubatingEgg', Runner.instance_.selectedItem);
     })
 
     document.getElementById('unincubate').addEventListener('click', () => {
-        setUnincubation(Runner.instance_.selectedEgg)
+        setUnincubation(Runner.instance_.selectedItem)
         window.localStorage.setItem('incubatingEgg', null);
 
     })
+
+    document.getElementById('hatch').addEventListener('click', () => {
+        hatch(Runner.instance_.selectedItem)
+    })
+}
+
+function setHatchingPrivledges() {
+    if (window.localStorage.getItem('incubationPercentage') === '100') {
+        document.getElementById('hatch').style.display = 'block'
+    } else {
+        document.getElementById('hatch').style.display = 'none'
+    }
 }
 
 function setIncubation(selectedEggId) {
     document.getElementById(selectedEggId).parentElement.innerHTML = `
         <label class='labl'>
-            <input type='radio' name='eggselection' value="${selectedEggId}" id="${selectedEggId}"/>
+            <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}"/>
             <div class='inventory-slot'>
                 <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
                 <div id="myProgress">
@@ -2895,7 +2913,7 @@ function setIncubation(selectedEggId) {
 function setUnincubation(selectedEggId) {
     document.getElementById(selectedEggId).parentElement.innerHTML = `
         <label class='labl'>
-            <input type='radio' name='eggselection' value="${selectedEggId}" id="${selectedEggId}"/>
+            <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}"/>
             <div class='inventory-slot'>
                 <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
             </div>
@@ -2903,18 +2921,27 @@ function setUnincubation(selectedEggId) {
     `
 }
 
+function hatch(selectedEggId) {
+    window.localStorage.setItem('incubationdistance', 0);
+    window.localStorage.setItem('incubationPercentage', 0);
+    document.getElementById('progress').style.width = `0%`
+    window.localStorage.setItem('dinoeggs', window.localStorage.getItem('dinoeggs') - 1)
+    window.localStorage.setItem('dinoNfts', (parseInt(window.localStorage.getItem('dinoNfts')) || 0) + 1)
+    setNFTs()
+    setUnincubation(selectedEggId)
+}
+
 function setNFTs() {
-    // TODO: implement
     var div = document.getElementById('skins');
     var numberOfSkins= parseInt(window.localStorage.getItem('dinoNfts'))
 
     let innerHTML = '';
-    for (let i = 0; i < Math.min(numberOfEggs, 5); i++) {
+    for (let i = 0; i < Math.min(numberOfSkins, 5); i++) {
       innerHTML = innerHTML + `
         <label class='labl'>
-            <input type='radio' name='eggselection' value="egg${i}" id="egg${i}"/>
+            <input type='radio' name='radioselection' value="skin${i}" id="skin${i}"/>
             <div class='inventory-slot'>
-                <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
+                <img src='./assets/default_200_percent/200-isolated-dino-sprite-cowboy-hat-cleaned-SIZED-pfp.png' class='skin' />
             </div>
         </label>
         `
@@ -2922,12 +2949,12 @@ function setNFTs() {
     }
     div.innerHTML = innerHTML;
 
-    document.getElementById('eggs').addEventListener('click', () => {
-        var ele = document.getElementsByName('eggselection');
+    document.getElementById('skins').addEventListener('click', () => {
+        var ele = document.getElementsByName('radioselection');
               
         for(i = 0; i < ele.length; i++) {
             if (ele[i].checked) {
-                Runner.instance_.selectedEgg = ele[i].id
+                Runner.instance_.selectedItem = ele[i].id
                 activateOptions()
             }
         }
@@ -2940,8 +2967,10 @@ function onDocumentLoad() {
   setEggs()
 
   document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: ${Math.round(parseInt(Runner.instance_.lifetimeDistance) * 0.025)}`
-  document.getElementById('progress').style.width = `${window.localStorage.getItem('incubationPercentage')}%`
-
+  if (document.getElementById('progress')) {
+      document.getElementById('progress').style.width = `${window.localStorage.getItem('incubationPercentage')}%`
+  }
+  setHatchingPrivledges()
   /* Action Button Implementations / NEAR Integration
    * yooinked from
    * https://github.com/near-examples/wallet-example/blob/master/src/main.js

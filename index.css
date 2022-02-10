@@ -119,6 +119,18 @@ html, body {
  height: 100%;
 }
 
+#hatch {
+ display: none;
+}
+
+#incubate {
+  display: block;
+}
+
+#unincubate {
+  display: none;
+}
+
 .labl {
   display : block;
   /* width: 100%; */
@@ -151,7 +163,7 @@ html, body {
 }
 
 #progress {
-  width: 1%;
+  /* width: 1%; */
   height: 8px;
   background-color: green;
 }
@@ -169,7 +181,7 @@ html, body {
   color: black;
 }
 
-.nft-pfp {
+.skin {
   width: 50px;
   height: 50px;
   background-size: cover;
