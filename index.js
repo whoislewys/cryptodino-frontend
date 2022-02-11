@@ -259,7 +259,6 @@
       updateDinoSprite: function (spriteTraits, hdpiPath, ldpiPath) {
         // update spritesheet
         var nftSpritesheetImg = ''
-        console.log('setting runner spritesheet img: ', nftSpritesheetImg);
         if (IS_HIDPI) {
           nftSpritesheetImg = document.createElement("img");
           nftSpritesheetImg.setAttribute('src', hdpiPath);
@@ -268,21 +267,62 @@
           nftSpritesheetImg.setAttribute('src', ldpiPath);
         }
         Runner.trexSpriteSheet = nftSpritesheetImg;
-        console.log('runner instance trex spritesheet', this.trexSpriteSheet);
 
         // instantiate new trex object
         const nftTrex = new Trex(this.canvas, this.trexSpriteDef.TREX);
-        console.log('setting runner trex to: ', nftTrex);
 
         // Change sprite render boundaries
+        Trex.config = Trex.withHatConfig;
         nftTrex.config = Trex.withHatConfig;
         Trex.animFrames = Trex.withHatAnimFrames;
 
         // For specific hat traits, game parameters (e.g. physics, token spawn rates, etc.)
         if (spriteTraits.includes('astronaut_helmet')) {
-          this.updateConfigSetting('GRAVITY', 0.3);
-        } else {
+          this.updateConfigSetting('GRAVITY', 0.25);
+          this.updateConfigSetting('MIN_JUMP_HEIGHT', 30);
+          this.updateConfigSetting('MAX_JUMP_HEIGHT', 40);
+          this.updateConfigSetting('SPEED_DROP_COEFFICIENT', 4);
+
+          // reset spawn rates
+          Obstacle.types = JSON.parse(JSON.stringify(Obstacle.ogTypes));
+        } else if (spriteTraits.includes('cowboy_hat')){
+          // reset default
           this.updateConfigSetting('GRAVITY', 0.6);
+          this.updateConfigSetting('MIN_JUMP_HEIGHT', 30);
+          this.updateConfigSetting('MAX_JUMP_HEIGHT', 30);
+          this.updateConfigSetting('SPEED_DROP_COEFFICIENT', 3);
+
+          // increase token spawn rates
+          for (let i = 0; i < 30; i++) {
+            Obstacle.types.push(
+              {
+                type: 'DINOCOIN',
+                width: 18, // width in 2x spritesheet must be 36
+                height: 20, // similarly, height of 40 per coin
+                yPos: [100, 75, 50], // Variable height.
+                yPosMobile: [100, 50], // Variable height mobile.
+                multipleSpeed: 999,
+                minSpeed: 0,
+                minGap: 0,
+                collisionBoxes: [
+                  new CollisionBox(15, 15, 16, 5),
+                  // TO DO: update this collision box... theres still something funky going on here
+                ],
+                numFrames: 12,
+                frameRate: 1000/6,
+                speedOffset: .8
+              },
+            )
+          }
+        } else {
+          // reset default
+          this.updateConfigSetting('GRAVITY', 0.6);
+          this.updateConfigSetting('MIN_JUMP_HEIGHT', 30);
+          this.updateConfigSetting('MAX_JUMP_HEIGHT', 30);
+          this.updateConfigSetting('SPEED_DROP_COEFFICIENT', 3);
+
+          // reset spawn rates
+          Obstacle.types = JSON.parse(JSON.stringify(Obstacle.ogTypes));
         }
 
         this.tRex = nftTrex;
@@ -292,10 +332,10 @@
         var nftSpritesheetImg = '';
         if (IS_HIDPI) {
           nftSpritesheetImg = document.createElement("img");
-          nftSpritesheetImg.setAttribute('src',  './assets/default_200_percent/200-isolated-dino-sprite.png');
+          nftSpritesheetImg.setAttribute('src', './assets/default_200_percent/200-isolated-dino-sprite.png');
         } else {
           nftSpritesheetImg = document.createElement("img");
-          nftSpritesheetImg.setAttribute('src',  './assets/default_100_percent/100-isolated-dino-sprite.png');
+          nftSpritesheetImg.setAttribute('src', './assets/default_100_percent/100-isolated-dino-sprite.png');
         }
         Runner.trexSpriteSheet = nftSpritesheetImg;
 
@@ -306,8 +346,13 @@
         defaultTrex.config = Trex.config;
         Trex.animFrames = Trex.ogAnimFrames;
         this.updateConfigSetting('GRAVITY', 0.6);
-
+        this.updateConfigSetting('MIN_JUMP_HEIGHT', 30);
+        this.updateConfigSetting('MAX_JUMP_HEIGHT', 30);
+        this.updateConfigSetting('SPEED_DROP_COEFFICIENT', 3);
         this.tRex = defaultTrex;
+
+        // reset spawn rates
+        Obstacle.types = JSON.parse(JSON.stringify(Obstacle.ogTypes));
       },
 
         /**
@@ -334,13 +379,13 @@
          * @param {*} value
          */
         updateConfigSetting: function (setting, value) {
-            console.log(`updating setting: ${setting}, value: ${value}`);
             if (setting in this.config && value != undefined) {
                 this.config[setting] = value;
 
                 switch (setting) {
                     case 'GRAVITY':
                     case 'MIN_JUMP_HEIGHT':
+                    case 'MAX_JUMP_HEIGHT':
                     case 'SPEED_DROP_COEFFICIENT':
                         this.tRex.config[setting] = value;
                         break;
@@ -360,6 +405,12 @@
          */
         loadImages: function () {
             if (IS_HIDPI) {
+                // TODO: use equipped spritesheet if there is one
+                // if (window.localStorage.getItem('equippedSkin') == null) {
+                //   spritesheetPath = './assets/default_200_percent/200-isolated-dino-sprite.png'
+                // }
+                // nftSpritesheetImg.setAttribute('src', spritesheetPath);
+
                 Runner.spriteSheet = document.getElementById('offline-resources-2x');
                 this.spriteDef = Runner.spriteDefinition.HDPI;
 
@@ -1602,7 +1653,92 @@
             yPosMobile: [100, 50], // Variable height mobile.
             multipleSpeed: 999,
             minSpeed: 0,
+            minGap: 20,
+            collisionBoxes: [
+              new CollisionBox(15, 15, 16, 5),
+              // TO DO: update this collision box... theres still something funky going on here
+            ],
+            numFrames: 12,
+            frameRate: 1000/6,
+            speedOffset: .8
+        },
+        {
+            type: 'DINOEGG',
+            width: 20, // width in 2x spritesheet must be 36
+            height: 24, // similarly, height of 40 per coin
+            yPos: 112,
+            multipleSpeed: 7,
+            minSpeed: 0,
             minGap: 150,
+            collisionBoxes: [
+                new CollisionBox(0, 0, 30, 30),
+                new CollisionBox(0, 0, 30, 30),
+                new CollisionBox(0, 0, 30, 30),
+            ],
+            numFrames: 1,
+            frameRate: 1000/6,
+            speedOffset: .8
+        },
+    ];
+
+    Obstacle.ogTypes = [
+        {
+            type: 'CACTUS_SMALL',
+            width: 17,
+            height: 35,
+            yPos: 105,
+            multipleSpeed: 4,
+            minGap: 120,
+            minSpeed: 0,
+            collisionBoxes: [
+                new CollisionBox(0, 7, 5, 27),
+                new CollisionBox(4, 0, 6, 34),
+                new CollisionBox(10, 4, 7, 14)
+            ]
+        },
+        {
+            type: 'CACTUS_LARGE',
+            width: 25,
+            height: 50,
+            yPos: 90,
+            multipleSpeed: 7,
+            minGap: 120,
+            minSpeed: 0,
+            collisionBoxes: [
+                new CollisionBox(0, 12, 7, 38),
+                new CollisionBox(8, 0, 7, 49),
+                new CollisionBox(13, 10, 10, 38)
+            ]
+        },
+        {
+            type: 'PTERODACTYL',
+            width: 46,
+            height: 40,
+            yPos: [100, 75, 50], // Variable height.
+            yPosMobile: [100, 50], // Variable height mobile.
+            multipleSpeed: 999,
+            minSpeed: 8.5,
+            minGap: 150,
+            collisionBoxes: [
+                new CollisionBox(15, 15, 16, 5),
+                new CollisionBox(18, 21, 24, 6),
+                new CollisionBox(2, 14, 4, 3),
+                new CollisionBox(6, 10, 4, 7),
+                new CollisionBox(10, 8, 6, 9)
+            ],
+            numFrames: 2,
+            frameRate: 1000 / 6,
+            speedOffset: .8
+        },
+        {
+            type: 'DINOCOIN',
+            width: 18, // width in 2x spritesheet must be 36
+            height: 20, // similarly, height of 40 per coin
+            yPos: [100, 75, 50], // Variable height.
+            yPosMobile: [100, 50], // Variable height mobile.
+            multipleSpeed: 999,
+            minSpeed: 0,
+            minGap: 20,
             collisionBoxes: [
               new CollisionBox(15, 15, 16, 5),
               // TO DO: update this collision box... theres still something funky going on here
@@ -1692,6 +1828,25 @@
         WIDTH_DUCK: 59
     };
 
+    Trex.ogConfig = {
+        DROP_VELOCITY: -5,
+        GRAVITY: 0.6,
+        // OG Sprite Height
+        HEIGHT: 47,
+        HEIGHT_DUCK: 25,
+        INIITAL_JUMP_VELOCITY: -10,
+        INTRO_DURATION: 1500,
+        MAX_JUMP_HEIGHT: 30,
+        MIN_JUMP_HEIGHT: 30,
+        SPEED_DROP_COEFFICIENT: 3,
+        // OG Sprite width
+        SPRITE_WIDTH: 262,
+        START_X_POS: 50,
+        // OG WIDTH
+        WIDTH: 44,
+        WIDTH_DUCK: 59
+    };
+
     Trex.withHatConfig = {
         DROP_VELOCITY: -5,
         GRAVITY: 0.6,
@@ -1702,7 +1857,7 @@
         INTRO_DURATION: 1500,
         MAX_JUMP_HEIGHT: 30,
         MIN_JUMP_HEIGHT: 30,
-        SPEED_DROP_COEFFICIENT: 2,
+        SPEED_DROP_COEFFICIENT: 3,
         // Cowboy hat width
         SPRITE_WIDTH: 281,
         START_X_POS: 50,
@@ -1924,7 +2079,6 @@
          * @param {number} y
          */
         draw: function (x, y) {
-          // console.log('trex drawing. anim frames: ', )
             var sourceX = x;
             var sourceY = y;
             var sourceWidth = this.ducking && this.status != Trex.status.CRASHED ?
@@ -3373,7 +3527,6 @@ function onDocumentLoad() {
       document.getElementById('cryptodino-storage-deposit').addEventListener('click', async () => {
         try {
           const storageDepositResp = await window.contract.storage_deposit({ account_id: window.accountId, amount: 0.00235 });
-          console.log('storage deposit resp: ', storageDepositResp);
         } catch (e) {
           console.error('e: ', e);
         }
@@ -3381,9 +3534,7 @@ function onDocumentLoad() {
 
       document.getElementById('cryptodino-nft-storage-deposit').addEventListener('click', async () => {
         try {
-            console.log(23, window.accountId)
           const storageDepositResp = await window.nftContract.storage_deposit({ account_id: window.accountId, amount: 0.00235 });
-          console.log('storage deposit resp: ', storageDepositResp);
         } catch (e) {
           console.error('e: ', e);
         }
@@ -3391,9 +3542,7 @@ function onDocumentLoad() {
 
       document.getElementById('cryptodino-see-nfts').addEventListener('click', async () => {
         try {
-            console.log(22, window.nftContract)
           const storageDepositResp = await window.nftContract.nft_token({ token_id: window.nftContract.contractId });
-          console.log('storage deposit resp: ', storageDepositResp);
         } catch (e) {
           console.error('e: ', e);
         }
