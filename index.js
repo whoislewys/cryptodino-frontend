@@ -274,12 +274,11 @@
         const nftTrex = new Trex(this.canvas, this.trexSpriteDef.TREX);
         console.log('setting runner trex to: ', nftTrex);
 
-        // TODO: for hat traits, change trex.config.height, trex.config.width, trex.config.SPRITE_WIDTH, and trex.animframes
+        // Change sprite render boundaries
         nftTrex.config = Trex.withHatConfig;
-        nftTrex.animFrames = Trex.withHatAnimFrames;
+        Trex.animFrames = Trex.withHatAnimFrames;
 
-        // TODO: Change render boundaries / game parameters (e.g. physics, token spawn rates, etc.)
-        // For specific hat traits, change dino configs
+        // For specific hat traits, game parameters (e.g. physics, token spawn rates, etc.)
         if (spriteTraits.includes('astronaut_helmet')) {
           this.updateConfigSetting('GRAVITY', 0.3);
         } else {
@@ -298,12 +297,16 @@
           nftSpritesheetImg = document.createElement("img");
           nftSpritesheetImg.setAttribute('src',  './assets/default_100_percent/100-isolated-dino-sprite.png');
         }
-
         Runner.trexSpriteSheet = nftSpritesheetImg;
 
+        // instantiate new trex object
+        const defaultTrex = new Trex(this.canvas, this.trexSpriteDef.TREX);
+
+        // Change sprite render boundaries / game parameters (e.g. physics, token spawn rates, etc.)
+        defaultTrex.config = Trex.config;
+        Trex.animFrames = Trex.ogAnimFrames;
         this.updateConfigSetting('GRAVITY', 0.6);
 
-        const defaultTrex = new Trex(this.canvas, this.trexSpriteDef.TREX);
         this.tRex = defaultTrex;
       },
 
@@ -1785,6 +1788,33 @@
         }
     };
 
+    Trex.ogAnimFrames = {
+        WAITING: {
+            // OG sprite frames
+            frames: [44, 0],
+            msPerFrame: 1000 / 3
+        },
+        RUNNING: {
+            // OG sprite frames
+            frames: [88, 132],
+            msPerFrame: 1000 / 12
+        },
+        CRASHED: {
+            // OG sprite frames
+            frames: [220],
+            msPerFrame: 1000 / 60
+        },
+        JUMPING: {
+            frames: [0],
+            msPerFrame: 1000 / 60
+        },
+        DUCKING: {
+            // OG sprite frames
+            frames: [264, 323],
+            msPerFrame: 1000 / 8
+        }
+    };
+
     Trex.withHatAnimFrames = {
         WAITING: {
             // Cowboy Hat Sprite Frames
@@ -1894,6 +1924,7 @@
          * @param {number} y
          */
         draw: function (x, y) {
+          // console.log('trex drawing. anim frames: ', )
             var sourceX = x;
             var sourceY = y;
             var sourceWidth = this.ducking && this.status != Trex.status.CRASHED ?
@@ -3031,7 +3062,6 @@ function activateOptions() {
   })
 
   document.getElementById('unequip').addEventListener('click', () => {
-    // TODO: make this actually revert to the default dino
     localStorage.removeItem('equippedSkin');
     setInventoryPrivledges();
     Runner.instance_.setDefaultSprite();
