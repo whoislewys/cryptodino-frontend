@@ -161,8 +161,31 @@ html, body {
   border: 1px solid #494949;
 }
 
+.hatch-confirm {
+  border-width: 2px;
+  border-style: outset;
+  border-left-color:rgb(118, 118, 118);
+  border-top-color:rgb(118, 118, 118);
+  border-right-color: rgb(33, 33, 33);
+  border-bottom-color: rgb(33, 33, 33);
+  margin-left: 20px;
+  margin-top: 10px;
+  width: calc(7.25rem - 4px);
+}
+
 .menu-flex {
   display: flex;
+}
+
+.vertical-flex {
+  display: none;
+  flex-direction: column;
+  text-align: center;
+}
+
+.hatch-confirm-buttons {
+  margin: 0px 10px 10px 10px;
+  width: calc(100% - 20px);
 }
 
 .action-buttons {
@@ -176,7 +199,7 @@ html, body {
 }
 
 #progress {
-  /* width: 1%; */
+  width: 0%;
   height: 8px;
   background-color: green;
 }

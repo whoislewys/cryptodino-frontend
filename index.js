@@ -871,9 +871,6 @@
                 console.log(555, !!window.localStorage.getItem('incubatingEgg'))
                 window.localStorage.setItem('incubationDistance', (parseInt(window.localStorage.getItem('incubationDistance')) || 0) + this.distanceRan);
             }
-            if (document.getElementById('progress')) {
-                document.getElementById('progress').style.width = `${window.localStorage.getItem('incubationPercentage')}%`
-            }
             setEggs()
             this.playSound(this.soundFx.HIT);
             vibrate(200);
@@ -908,6 +905,9 @@
             this.paused = true;
             cancelAnimationFrame(this.raqId);
             this.raqId = 0;
+            if (document.getElementById('progress')) {
+                document.getElementById('progress').style.width = `${window.localStorage.getItem('incubationPercentage')}%`
+            }
         },
 
         play: function () {
@@ -2969,6 +2969,14 @@ function setEggs() {
     })         
 };
 
+function toggleHatchConfirm() {
+    if (document.getElementById('hatch-confirm').style.display === 'none') {
+        document.getElementById('hatch-confirm').style.display = 'flex'
+    } else {
+        document.getElementById('hatch-confirm').style.display = 'none'
+    }
+}
+
 function activateOptions() {
     document.getElementById('action-buttons').style.display = 'flex'
 
@@ -2992,13 +3000,28 @@ function activateOptions() {
     })
 
     document.getElementById('hatch').addEventListener('click', () => {
-        hatch(window.localStorage.getItem('selectedItem'))
+        toggleHatchConfirm()
     })
 
-  document.getElementById('equip').addEventListener('click', () => {
-    localStorage.setItem('equippedSkin', localStorage.getItem('selectedItem'));
-    const equippedSkin = window.localStorage.getItem('equippedSkin')
-    setInventoryPrivledges();
+    document.getElementById('hatch-confirm-cancel').addEventListener('click', () => {
+        toggleHatchConfirm()
+    })
+
+    document.getElementById('hatch-confirm-yes').addEventListener('click', () => {
+        const tokens = parseInt(window.localStorage.getItem('dinoToken')) || 0
+        if (tokens >= 10) {
+            hatch(window.localStorage.getItem('selectedItem'))
+            toggleHatchConfirm()
+        } else {
+            console.log('INSUFFICIENT FUNDS')
+            // TODO: Create insufficient funds message on UI
+        }
+    })
+
+    document.getElementById('equip').addEventListener('click', () => {
+        localStorage.setItem('equippedSkin', localStorage.getItem('selectedItem'));
+        const equippedSkin = window.localStorage.getItem('equippedSkin')
+        setInventoryPrivledges();
 
     if (equippedSkin === 'skin0') {
       Runner.instance_.updateDinoSprite(['astronaut_helmet'],'./assets/default_200_percent/200-isolated-dino-sprite-astrohelmet-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_astrohelmet-CLEANED.png');
@@ -3080,38 +3103,38 @@ function setIncubationPrivledges(selectedItem) {
 function setIncubation(selectedEggId) {
     window.localStorage.setItem('incubatingEgg', selectedEggId)
     document.getElementById(selectedEggId).parentElement.innerHTML = `
-        <label class='labl'>
-            <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}"/>
-            <div class='inventory-slot'>
-                <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
-                <div id="myProgress">
-                    <div id="progress"></div>
-                </div>
+        <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}" checked="checked"/>
+        <div class='inventory-slot'>
+            <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
+            <div id="myProgress">
+                <div id="progress"></div>
             </div>
-        </label>
+        </div>
     `
+    setInventoryPrivledges()
 }
 
 function setUnincubation(selectedEggId) {
     window.localStorage.setItem('incubatingEgg', null)
     document.getElementById(selectedEggId).parentElement.innerHTML = `
-        <label class='labl'>
-            <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}"/>
-            <div class='inventory-slot'>
-                <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
-            </div>
-        </label>
+        <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}" checked="checked"/>
+        <div class='inventory-slot'>
+            <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
+        </div>
     `
+    setInventoryPrivledges()
 }
 
 function hatch(selectedEggId) {
     window.localStorage.setItem('incubationDistance', 0);
     window.localStorage.setItem('incubationPercentage', 0);
+    window.localStorage.setItem('dinoToken', parseInt(window.localStorage.getItem('dinoToken')) - 10);
     document.getElementById('progress').style.width = `0%`
     window.localStorage.setItem('dinoEggs', window.localStorage.getItem('dinoEggs') - 1)
     window.localStorage.setItem('dinoNfts', (parseInt(window.localStorage.getItem('dinoNfts')) || 0) + 1)
     setNFTs()
     setUnincubation(selectedEggId)
+    setInventoryPrivledges()
 }
 
 function setNFTs() {
