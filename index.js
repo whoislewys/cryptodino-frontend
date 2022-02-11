@@ -18,6 +18,8 @@
         }
         Runner.instance_ = this;
 
+        this.trexFactory = Trex;
+
         this.outerContainerEl = document.querySelector(outerContainerId);
         this.containerEl = null;
         this.snackbarEl = null;
@@ -252,6 +254,28 @@
             // return loadTimeData && loadTimeData.valueExists('disabledEasterEgg');
             return false;
         },
+
+      setDinoSprite: function (hdpiPath, ldpiPath) {
+        // TODO: Change hitboxes to helmet sprite boxes OR default boxes, Change gravity if NFT type is astrohelmet
+        var nftSpritesheetImg = ''
+
+        console.log('setting runner spritesheet img: ', nftSpritesheetImg);
+        if (IS_HIDPI) {
+          nftSpritesheetImg = document.createElement("img");
+          nftSpritesheetImg.setAttribute('src', hdpiPath);
+        } else {
+          nftSpritesheetImg = document.createElement("img");
+          nftSpritesheetImg.setAttribute('src', ldpiPath);
+        }
+
+        Runner.trexSpriteSheet = nftSpritesheetImg;
+        console.log('runner instance trex spritesheet', this.trexSpriteSheet);
+
+        const nftTrex = new Trex(this.canvas, this.trexSpriteDef.TREX);
+        console.log('setting runner trex to: ', nftTrex);
+        this.tRex = nftTrex;
+        console.log('runner instance trex: ', Runner.instance_.trex);
+      },
 
         /**
          * For disabled instances, set up a snackbar with the disabled message.
@@ -2897,12 +2921,22 @@ function activateOptions() {
         hatch(window.localStorage.getItem('selectedItem'))
     })
 
-    document.getElementById('equip').addEventListener('click', () => {
-        // TODO: setup equipping
-        // Change hitboxes to helmet sprite boxes OR default boxes
-        // Change gravity if NFT type is astrohelmet
+  document.getElementById('equip').addEventListener('click', () => {
+    localStorage.setItem('equippedSkin', localStorage.getItem('selectedItem'));
+    const equippedSkin = window.localStorage.getItem('equippedSkin')
+    setInventoryPrivledges();
 
-    })
+    if (equippedSkin === 'skin0') {
+      Runner.instance_.setDinoSprite('./assets/default_200_percent/200-isolated-dino-sprite-astrohelmet-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_astrohelmet-CLEANED.png');
+    } else if (equippedSkin === 'skin1') {
+      Runner.instance_.setDinoSprite('./assets/default_200_percent/200-isolated-dino-sprite-cowboy-hat-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_cowboyhat-CLEANED.png');
+    }
+  })
+
+  document.getElementById('unequip').addEventListener('click', () => {
+    localStorage.removeItem('equippedSkin');
+    setInventoryPrivledges();
+  })
 }
 
 function setInventoryPrivledges() {
@@ -2924,10 +2958,11 @@ function setHatchingPrivledges(selectedItem) {
 
 function setEquipingPrivledges(selectedItem) {
     // Change 'equippedSkin' to the name of the localstorage variable
-    // const equippedSkin = window.localStorage.getItem('equippedSkin')
+    const equippedSkin = window.localStorage.getItem('equippedSkin')
+  // selectedItem.substring(0,4) === 'skin'
     if (selectedItem &&
-        selectedItem.substring(0,4) === 'skin'
-        // && selectedItem === equippedSkin
+        selectedItem.substring(0,4) === 'skin' &&
+        selectedItem !== equippedSkin
     ) {
         document.getElementById('equip').style.display = 'block'
     } else {
