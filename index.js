@@ -816,9 +816,6 @@
                 console.log(555, !!window.localStorage.getItem('incubatingEgg'))
                 window.localStorage.setItem('incubationDistance', (parseInt(window.localStorage.getItem('incubationDistance')) || 0) + this.distanceRan);
             }
-            if (document.getElementById('progress')) {
-                document.getElementById('progress').style.width = `${window.localStorage.getItem('incubationPercentage')}%`
-            }
             setEggs()
             this.playSound(this.soundFx.HIT);
             vibrate(200);
@@ -853,6 +850,9 @@
             this.paused = true;
             cancelAnimationFrame(this.raqId);
             this.raqId = 0;
+            if (document.getElementById('progress')) {
+                document.getElementById('progress').style.width = `${window.localStorage.getItem('incubationPercentage')}%`
+            }        
         },
 
         play: function () {
@@ -2969,28 +2969,26 @@ function setIncubationPrivledges(selectedItem) {
 function setIncubation(selectedEggId) {
     window.localStorage.setItem('incubatingEgg', selectedEggId)
     document.getElementById(selectedEggId).parentElement.innerHTML = `
-        <label class='labl'>
-            <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}"/>
-            <div class='inventory-slot'>
-                <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
-                <div id="myProgress">
-                    <div id="progress"></div>
-                </div>
+        <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}" checked="checked"/>
+        <div class='inventory-slot'>
+            <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
+            <div id="myProgress">
+                <div id="progress"></div>
             </div>
-        </label>
+        </div>
     `
+    setInventoryPrivledges()
 }
 
 function setUnincubation(selectedEggId) {
     window.localStorage.setItem('incubatingEgg', null)
     document.getElementById(selectedEggId).parentElement.innerHTML = `
-        <label class='labl'>
-            <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}"/>
-            <div class='inventory-slot'>
-                <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
-            </div>
-        </label>
+        <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}" checked="checked"/>
+        <div class='inventory-slot'>
+            <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
+        </div>
     `
+    setInventoryPrivledges()
 }
 
 function hatch(selectedEggId) {
@@ -3001,6 +2999,7 @@ function hatch(selectedEggId) {
     window.localStorage.setItem('dinoNfts', (parseInt(window.localStorage.getItem('dinoNfts')) || 0) + 1)
     setNFTs()
     setUnincubation(selectedEggId)
+    setInventoryPrivledges()
 }
 
 function setNFTs() {

@@ -176,7 +176,7 @@ html, body {
 }
 
 #progress {
-  /* width: 1%; */
+  width: 0%;
   height: 8px;
   background-color: green;
 }
