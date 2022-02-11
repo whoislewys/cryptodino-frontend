@@ -2940,7 +2940,7 @@ function activateOptions() {
             toggleHatchConfirm()
         } else {
             console.log('INSUFFICIENT FUNDS')
-            // TODO: Create insufficient funds message on UI
+            window.alert('INSUFFICIENT FUNDS');
         }
     })
 
@@ -2972,7 +2972,10 @@ function setInventoryPrivledges() {
 }
 
 function setHatchingPrivledges(selectedItem) {
-    if (window.localStorage.getItem('incubationPercentage') === '100') {
+    if (window.localStorage.getItem('incubationPercentage') === '100' &&
+        selectedItem &&
+        selectedItem.substring(0,3) === 'egg'
+    ) {
         document.getElementById('hatch').style.display = 'block'
     } else {
         document.getElementById('hatch').style.display = 'none'
