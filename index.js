@@ -18,8 +18,6 @@
         }
         Runner.instance_ = this;
 
-        this.trexFactory = Trex;
-
         this.outerContainerEl = document.querySelector(outerContainerId);
         this.containerEl = null;
         this.snackbarEl = null;
@@ -255,10 +253,12 @@
             return false;
         },
 
-      setDinoSprite: function (hdpiPath, ldpiPath) {
-        // TODO: Change hitboxes to helmet sprite boxes OR default boxes, Change gravity if NFT type is astrohelmet
+      // @param spriteTraits: <List<String>> | List of traits dino nft contains
+      // @param hdpiPath: <String> | Hdpi spritesheet path
+      // @param ldpiPath: <String> | Ldpi spritesheet path
+      updateDinoSprite: function (spriteTraits, hdpiPath, ldpiPath) {
+        // update spritesheet
         var nftSpritesheetImg = ''
-
         console.log('setting runner spritesheet img: ', nftSpritesheetImg);
         if (IS_HIDPI) {
           nftSpritesheetImg = document.createElement("img");
@@ -267,14 +267,26 @@
           nftSpritesheetImg = document.createElement("img");
           nftSpritesheetImg.setAttribute('src', ldpiPath);
         }
-
         Runner.trexSpriteSheet = nftSpritesheetImg;
         console.log('runner instance trex spritesheet', this.trexSpriteSheet);
 
+        // instantiate new trex object
         const nftTrex = new Trex(this.canvas, this.trexSpriteDef.TREX);
         console.log('setting runner trex to: ', nftTrex);
+
+        // TODO: for hat traits, change trex.config.height, trex.config.width, trex.config.SPRITE_WIDTH, and trex.animframes
+        nftTrex.config = Trex.withHatConfig;
+        nftTrex.animFrames = Trex.withHatAnimFrames;
+
+        // TODO: Change render boundaries / game parameters (e.g. physics, token spawn rates, etc.)
+        // For specific hat traits, change dino configs
+        if (spriteTraits.includes('astronaut_helmet')) {
+          this.updateConfigSetting('GRAVITY', 0.3);
+        } else {
+          this.updateConfigSetting('GRAVITY', 0.6);
+        }
+
         this.tRex = nftTrex;
-        console.log('runner instance trex: ', Runner.instance_.trex);
       },
 
         /**
@@ -301,6 +313,7 @@
          * @param {*} value
          */
         updateConfigSetting: function (setting, value) {
+            console.log(`updating setting: ${setting}, value: ${value}`);
             if (setting in this.config && value != undefined) {
                 this.config[setting] = value;
 
@@ -1644,8 +1657,6 @@
         GRAVITY: 0.6,
         // OG Sprite Height
         HEIGHT: 47,
-        // Cowboy hat height
-        // HEIGHT: 57,
         HEIGHT_DUCK: 25,
         INIITAL_JUMP_VELOCITY: -10,
         INTRO_DURATION: 1500,
@@ -1654,16 +1665,30 @@
         SPEED_DROP_COEFFICIENT: 3,
         // OG Sprite width
         SPRITE_WIDTH: 262,
-        // Cowboy hat width
-        // SPRITE_WIDTH: 281,
         START_X_POS: 50,
         // OG WIDTH
         WIDTH: 44,
-        // Cowboy hat width
-        // WIDTH: 47,
         WIDTH_DUCK: 59
     };
 
+    Trex.withHatConfig = {
+        DROP_VELOCITY: -5,
+        GRAVITY: 0.6,
+        // Cowboy hat height
+        HEIGHT: 57,
+        HEIGHT_DUCK: 25,
+        INIITAL_JUMP_VELOCITY: -10,
+        INTRO_DURATION: 1500,
+        MAX_JUMP_HEIGHT: 30,
+        MIN_JUMP_HEIGHT: 30,
+        SPEED_DROP_COEFFICIENT: 2,
+        // Cowboy hat width
+        SPRITE_WIDTH: 281,
+        START_X_POS: 50,
+        // Cowboy hat width
+        WIDTH: 47,
+        WIDTH_DUCK: 59
+    };
 
     /**
      * Used in collision detection.
@@ -1742,6 +1767,33 @@
         }
     };
 
+    Trex.withHatAnimFrames = {
+        WAITING: {
+            // Cowboy Hat Sprite Frames
+            frames: [47, 0],
+            msPerFrame: 1000 / 3
+        },
+        RUNNING: {
+            // Cowboy Hat Sprite Frames
+            frames: [94, 141],
+            msPerFrame: 1000 / 12
+        },
+        CRASHED: {
+            // Cowboy Hat Sprite Frames
+            frames: [238],
+            msPerFrame: 1000 / 60
+        },
+        JUMPING: {
+            frames: [0],
+            msPerFrame: 1000 / 60
+        },
+        DUCKING: {
+            // Cowboy Hat Sprite Frames
+            frames: [285, 347],
+            msPerFrame: 1000 / 8
+        }
+    };
+
 
     Trex.prototype = {
         /**
@@ -1756,6 +1808,10 @@
 
             this.draw(0, 0);
             this.update(0, Trex.status.WAITING);
+        },
+
+        setConfig: function (trexConfig) {
+            this.config = trexConfig;
         },
 
         /**
@@ -2927,9 +2983,9 @@ function activateOptions() {
     setInventoryPrivledges();
 
     if (equippedSkin === 'skin0') {
-      Runner.instance_.setDinoSprite('./assets/default_200_percent/200-isolated-dino-sprite-astrohelmet-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_astrohelmet-CLEANED.png');
+      Runner.instance_.updateDinoSprite(['astronaut_helmet'],'./assets/default_200_percent/200-isolated-dino-sprite-astrohelmet-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_astrohelmet-CLEANED.png');
     } else if (equippedSkin === 'skin1') {
-      Runner.instance_.setDinoSprite('./assets/default_200_percent/200-isolated-dino-sprite-cowboy-hat-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_cowboyhat-CLEANED.png');
+      Runner.instance_.updateDinoSprite(['cowboy_hat'], './assets/default_200_percent/200-isolated-dino-sprite-cowboy-hat-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_cowboyhat-CLEANED.png');
     }
   })
 
