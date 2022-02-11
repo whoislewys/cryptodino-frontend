@@ -3018,15 +3018,17 @@ function activateOptions() {
         for (let i = 0; i < numberOfEggs; i++) {
             var eggId = `egg${i}`
             if (eggId !== selectedItem) {
-                setUnincubation(eggId)
+                setUnincubation(eggId, '')
             }
         }
         window.localStorage.setItem('incubatingEgg', selectedItem);
+        setInventoryPrivledges()
     })
 
     document.getElementById('unincubate').addEventListener('click', () => {
-        setUnincubation(window.localStorage.getItem('selectedItem'))
+        setUnincubation(window.localStorage.getItem('selectedItem'), 'checked="checked"')
         window.localStorage.setItem('incubatingEgg', null);
+        setInventoryPrivledges()
 
     })
 
@@ -3145,18 +3147,16 @@ function setIncubation(selectedEggId) {
             </div>
         </div>
     `
-    setInventoryPrivledges()
 }
 
-function setUnincubation(selectedEggId) {
+function setUnincubation(selectedEggId, checked) {
     window.localStorage.setItem('incubatingEgg', null)
     document.getElementById(selectedEggId).parentElement.innerHTML = `
-        <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}" checked="checked"/>
+        <input type='radio' name='radioselection' value="${selectedEggId}" id="${selectedEggId}" ${checked}/>
         <div class='inventory-slot'>
             <img src='./assets/designs/Yoshi Egg/egg-shadowed-cleaned.png' class='egg'/>
         </div>
     `
-    setInventoryPrivledges()
 }
 
 function hatch(selectedEggId) {
@@ -3168,7 +3168,7 @@ function hatch(selectedEggId) {
     window.localStorage.setItem('dinoNfts', (parseInt(window.localStorage.getItem('dinoNfts')) || 0) + 1)
     setNFTs()
     setInventoryCount()
-    setUnincubation(selectedEggId)
+    setUnincubation(selectedEggId, '')
     setInventoryPrivledges()
 }
 
