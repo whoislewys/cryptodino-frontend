@@ -2895,6 +2895,14 @@ function setEggs() {
     })         
 };
 
+function toggleHatchConfirm() {
+    if (document.getElementById('hatch-confirm').style.display === 'none') {
+        document.getElementById('hatch-confirm').style.display = 'flex'
+    } else {
+        document.getElementById('hatch-confirm').style.display = 'none'
+    }
+}
+
 function activateOptions() {
     document.getElementById('action-buttons').style.display = 'flex'
 
@@ -2918,25 +2926,40 @@ function activateOptions() {
     })
 
     document.getElementById('hatch').addEventListener('click', () => {
-        hatch(window.localStorage.getItem('selectedItem'))
+        toggleHatchConfirm()
+    })
+    
+    document.getElementById('hatch-confirm-cancel').addEventListener('click', () => {
+        toggleHatchConfirm()
     })
 
-  document.getElementById('equip').addEventListener('click', () => {
-    localStorage.setItem('equippedSkin', localStorage.getItem('selectedItem'));
-    const equippedSkin = window.localStorage.getItem('equippedSkin')
-    setInventoryPrivledges();
+    document.getElementById('hatch-confirm-yes').addEventListener('click', () => {
+        const tokens = parseInt(window.localStorage.getItem('dinoToken')) || 0
+        if (tokens >= 10) {
+            hatch(window.localStorage.getItem('selectedItem'))
+            toggleHatchConfirm()
+        } else {
+            console.log('INSUFFICIENT FUNDS')
+            // TODO: Create insufficient funds message on UI
+        }
+    })
 
-    if (equippedSkin === 'skin0') {
-      Runner.instance_.setDinoSprite('./assets/default_200_percent/200-isolated-dino-sprite-astrohelmet-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_astrohelmet-CLEANED.png');
-    } else if (equippedSkin === 'skin1') {
-      Runner.instance_.setDinoSprite('./assets/default_200_percent/200-isolated-dino-sprite-cowboy-hat-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_cowboyhat-CLEANED.png');
-    }
-  })
+    document.getElementById('equip').addEventListener('click', () => {
+        localStorage.setItem('equippedSkin', localStorage.getItem('selectedItem'));
+        const equippedSkin = window.localStorage.getItem('equippedSkin')
+        setInventoryPrivledges();
 
-  document.getElementById('unequip').addEventListener('click', () => {
-    localStorage.removeItem('equippedSkin');
-    setInventoryPrivledges();
-  })
+        if (equippedSkin === 'skin0') {
+        Runner.instance_.setDinoSprite('./assets/default_200_percent/200-isolated-dino-sprite-astrohelmet-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_astrohelmet-CLEANED.png');
+        } else if (equippedSkin === 'skin1') {
+        Runner.instance_.setDinoSprite('./assets/default_200_percent/200-isolated-dino-sprite-cowboy-hat-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_cowboyhat-CLEANED.png');
+        }
+    })
+
+    document.getElementById('unequip').addEventListener('click', () => {
+        localStorage.removeItem('equippedSkin');
+        setInventoryPrivledges();
+    })
 }
 
 function setInventoryPrivledges() {
@@ -3029,6 +3052,7 @@ function setUnincubation(selectedEggId) {
 function hatch(selectedEggId) {
     window.localStorage.setItem('incubationDistance', 0);
     window.localStorage.setItem('incubationPercentage', 0);
+    window.localStorage.setItem('dinoToken', parseInt(window.localStorage.getItem('dinoToken')) - 10);
     document.getElementById('progress').style.width = `0%`
     window.localStorage.setItem('dinoEggs', window.localStorage.getItem('dinoEggs') - 1)
     window.localStorage.setItem('dinoNfts', (parseInt(window.localStorage.getItem('dinoNfts')) || 0) + 1)
