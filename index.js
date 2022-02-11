@@ -3080,7 +3080,8 @@ function setInventoryPrivledges() {
 function setHatchingPrivledges(selectedItem) {
     if (window.localStorage.getItem('incubationPercentage') === '100' &&
         selectedItem &&
-        selectedItem.substring(0,3) === 'egg'
+        selectedItem.substring(0,3) === 'egg' &&
+        selectedItem === window.localStorage.getItem('incubatingEgg')
     ) {
         document.getElementById('hatch').style.display = 'block'
     } else {
