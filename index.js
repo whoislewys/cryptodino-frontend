@@ -685,7 +685,7 @@
                 // Check for collisions.
                 // DEBUG MODE: pass in this.canvasCtx as 3rd arg
                 var collision = hasObstacles &&
-                    checkForCollision(this.horizon.obstacles[0], this.tRex, this.canvasCtx);
+                    checkForCollision(this.horizon.obstacles[0], this.tRex);
 
                 if (!collision) {
                     this.distanceRan += this.currentSpeed * deltaTime / this.msPerFrame;
