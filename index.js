@@ -868,9 +868,9 @@
         gameOver: function () {
             window.localStorage.setItem('lifetimeDistance', (parseInt(window.localStorage.getItem('lifetimeDistance')) || 0) + this.distanceRan);
             if (window.localStorage.getItem('incubatingEgg') && window.localStorage.getItem('incubatingEgg') !== 'null') {
-                console.log(555, !!window.localStorage.getItem('incubatingEgg'))
                 window.localStorage.setItem('incubationDistance', (parseInt(window.localStorage.getItem('incubationDistance')) || 0) + this.distanceRan);
             }
+            setInventoryCount()
             setEggs()
             this.playSound(this.soundFx.HIT);
             vibrate(200);
@@ -3137,6 +3137,7 @@ function hatch(selectedEggId) {
     window.localStorage.setItem('dinoEggs', window.localStorage.getItem('dinoEggs') - 1)
     window.localStorage.setItem('dinoNfts', (parseInt(window.localStorage.getItem('dinoNfts')) || 0) + 1)
     setNFTs()
+    setInventoryCount()
     setUnincubation(selectedEggId)
     setInventoryPrivledges()
 }
@@ -3149,7 +3150,7 @@ function setNFTs() {
     if (numberOfSkins === 0) {
         innerHTML = '<div>You dont have any skins yet</div>'
     }
-    for (let i = 0; i < Math.min(numberOfSkins, 5); i++) {
+    for (let i = 0; i < Math.min(numberOfSkins, 2); i++) {
       if (i === 0) {
         innerHTML = innerHTML + `
         <label class='labl'>
@@ -3186,11 +3187,19 @@ function setNFTs() {
     
 };
 
+function setInventoryCount() {
+    const nftCount = parseInt(window.localStorage.getItem('dinoNfts')) || 0
+    const eggCount = parseInt(window.localStorage.getItem('dinoEggs')) || 0
+    document.getElementById('nft-count').innerHTML = `NFTs: ${nftCount}/2`
+    document.getElementById('egg-count').innerHTML = `Eggs: ${eggCount}/5`
+}
+
 function onDocumentLoad() {
   document.getElementById('cryptodino-coins-collected').innerHTML = parseInt(window.localStorage.getItem('dinoToken')) || 0;
   new Runner('.interstitial-wrapper');
   setEggs()
   setNFTs()
+  setInventoryCount()
 
   document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: ${Math.round(parseInt(window.localStorage.getItem('lifetimeDistance') || 0 ) * 0.025)}`
   if (document.getElementById('progress')) {
