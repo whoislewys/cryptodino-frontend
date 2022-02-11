@@ -289,6 +289,24 @@
         this.tRex = nftTrex;
       },
 
+      setDefaultSprite: function () {
+        var nftSpritesheetImg = '';
+        if (IS_HIDPI) {
+          nftSpritesheetImg = document.createElement("img");
+          nftSpritesheetImg.setAttribute('src',  './assets/default_200_percent/200-isolated-dino-sprite.png');
+        } else {
+          nftSpritesheetImg = document.createElement("img");
+          nftSpritesheetImg.setAttribute('src',  './assets/default_100_percent/100-isolated-dino-sprite.png');
+        }
+
+        Runner.trexSpriteSheet = nftSpritesheetImg;
+
+        this.updateConfigSetting('GRAVITY', 0.6);
+
+        const defaultTrex = new Trex(this.canvas, this.trexSpriteDef.TREX);
+        this.tRex = defaultTrex;
+      },
+
         /**
          * For disabled instances, set up a snackbar with the disabled message.
          */
@@ -2990,8 +3008,10 @@ function activateOptions() {
   })
 
   document.getElementById('unequip').addEventListener('click', () => {
+    // TODO: make this actually revert to the default dino
     localStorage.removeItem('equippedSkin');
     setInventoryPrivledges();
+    Runner.instance_.setDefaultSprite();
   })
 }
 
