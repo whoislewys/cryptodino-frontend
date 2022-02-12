@@ -703,7 +703,7 @@
                 if (!collision) {
                     this.distanceRan += this.currentSpeed * deltaTime / this.msPerFrame;
                     var lifetimeDistance = (parseInt(window.localStorage.getItem('lifetimeDistance')) || 0) + this.distanceRan
-                    document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: ${Math.round(parseInt(lifetimeDistance) * 0.025)}`
+                    document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: <b>${Math.round(parseInt(lifetimeDistance) * 0.025)}</b>`
 
                     var incubationDistance = (parseInt(window.localStorage.getItem('incubationDistance')) || 0) + this.distanceRan
                     if (document.getElementById('progress') && 
@@ -3392,8 +3392,8 @@ function setNFTs() {
 function setInventoryCount() {
     const nftCount = parseInt(window.localStorage.getItem('dinoNfts')) || 0
     const eggCount = parseInt(window.localStorage.getItem('dinoEggs')) || 0
-    document.getElementById('nft-count').innerHTML = `NFTs: ${nftCount}/2`
-    document.getElementById('egg-count').innerHTML = `Eggs: ${eggCount}/5`
+    document.getElementById('nft-count').innerHTML = `<b>NFTs: ${nftCount}/2</b>`
+  document.getElementById('egg-count').innerHTML = `Eggs: <b>${eggCount}/5</b>`
 }
 
 function onDocumentLoad() {
