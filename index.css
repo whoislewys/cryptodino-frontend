@@ -231,6 +231,10 @@ html, body {
   margin-left: 10px;
 }
 
+.faq-text {
+  margin-left: 10px;
+}
+
 #inventory {
   display: none;
 }
