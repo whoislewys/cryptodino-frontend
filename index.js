@@ -257,6 +257,7 @@
       // @param hdpiPath: <String> | Hdpi spritesheet path
       // @param ldpiPath: <String> | Ldpi spritesheet path
       updateDinoSprite: function (spriteTraits, hdpiPath, ldpiPath) {
+        console.log('update dino sprite to traits: ', spriteTraits);
         // update spritesheet
         var nftSpritesheetImg = ''
         if (IS_HIDPI) {
@@ -272,9 +273,19 @@
         const nftTrex = new Trex(this.canvas, this.trexSpriteDef.TREX);
 
         // Change sprite render boundaries
-        Trex.config = Trex.withHatConfig;
+        // console.log('nft config before: ', nftTrex.config);
+        // console.log('trex with hat config before: ', Trex.withHatConfig);
         nftTrex.config = Trex.withHatConfig;
+        // console.log('nft config after: ', nftTrex.config);
+        // console.log('trex with hat config after: ', Trex.withHatConfig);
+
+        // console.log('trex anim frames b4: ', Trex.animFrames);
+        // console.log('trex with hat animFrames b4: ', Trex.withHatAnimFrames);
         Trex.animFrames = Trex.withHatAnimFrames;
+        // console.log('trex anim frames after: ', Trex.animFrames);
+        // console.log('trex with hat animFrames after: ', Trex.withHatAnimFrames);
+
+        // TODO: call update(0) to immediately render new skin?
 
         // For specific hat traits, game parameters (e.g. physics, token spawn rates, etc.)
         if (spriteTraits.includes('astronaut_helmet')) {
@@ -345,6 +356,8 @@
         // Change sprite render boundaries / game parameters (e.g. physics, token spawn rates, etc.)
         defaultTrex.config = Trex.config;
         Trex.animFrames = Trex.ogAnimFrames;
+
+        // reset dino params
         this.updateConfigSetting('GRAVITY', 0.6);
         this.updateConfigSetting('MIN_JUMP_HEIGHT', 30);
         this.updateConfigSetting('MAX_JUMP_HEIGHT', 30);
@@ -3205,16 +3218,21 @@ function activateOptions() {
         }
     })
 
-    document.getElementById('equip').addEventListener('click', () => {
-        localStorage.setItem('equippedSkin', localStorage.getItem('selectedItem'));
-        const equippedSkin = window.localStorage.getItem('equippedSkin')
-        setInventoryPrivledges();
+  document.getElementById('equip').addEventListener('click', () => {
+    if (localStorage.getItem('equippedSkin') != localStorage.getItem('selectedItem')) {
+      // ensure skin only gets equipped once
+      localStorage.setItem('equippedSkin', localStorage.getItem('selectedItem'));
 
-    if (equippedSkin === 'skin0') {
-      Runner.instance_.updateDinoSprite(['astronaut_helmet'],'./assets/default_200_percent/200-isolated-dino-sprite-astrohelmet-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_astrohelmet-CLEANED.png');
-    } else if (equippedSkin === 'skin1') {
-      Runner.instance_.updateDinoSprite(['cowboy_hat'], './assets/default_200_percent/200-isolated-dino-sprite-cowboy-hat-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_cowboyhat-CLEANED.png');
+      const equippedSkin = window.localStorage.getItem('equippedSkin')
+      setInventoryPrivledges();
+
+      if (equippedSkin === 'skin0') {
+        Runner.instance_.updateDinoSprite(['astronaut_helmet'],'./assets/default_200_percent/200-isolated-dino-sprite-astrohelmet-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_astrohelmet-CLEANED.png');
+      } else if (equippedSkin === 'skin1') {
+        Runner.instance_.updateDinoSprite(['cowboy_hat'], './assets/default_200_percent/200-isolated-dino-sprite-cowboy-hat-cleaned-SIZED.png', './assets/default_100_percent/100-isolated-dino-sprite_cowboyhat-CLEANED.png');
+      }
     }
+
   })
 
   document.getElementById('unequip').addEventListener('click', () => {
@@ -3385,7 +3403,7 @@ function onDocumentLoad() {
   setNFTs()
   setInventoryCount()
 
-  document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: ${Math.round(parseInt(window.localStorage.getItem('lifetimeDistance') || 0 ) * 0.025)}`
+  document.getElementById('total-distance-run').innerHTML = `Lifetime Distance: <b>${Math.round(parseInt(window.localStorage.getItem('lifetimeDistance') || 0 ) * 0.025)}</b>`
   if (document.getElementById('progress')) {
       document.getElementById('progress').style.width = `${window.localStorage.getItem('incubationPercentage')}%`
   }
