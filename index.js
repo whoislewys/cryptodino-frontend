@@ -3497,7 +3497,7 @@ function onDocumentLoad() {
 
   async function signedInFlow() {
     // Displaying current account name.
-    document.getElementById('login-with-near-button').innerText = window.accountId;
+    document.getElementById('login-with-near-button').innerHTML = `<p class='cryptodino-action-button-text'>${window.accountId.match(/[^.]*/)}</p>`;
 
     // Sign out button
     document.getElementById('sign-out').addEventListener('click', async() => {
