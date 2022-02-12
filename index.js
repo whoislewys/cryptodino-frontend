@@ -207,7 +207,8 @@
     Runner.sounds = {
         BUTTON_PRESS: 'offline-sound-press',
         HIT: 'offline-sound-hit',
-        SCORE: 'offline-sound-reached'
+        SCORE: 'offline-sound-reached',
+        COIN: 'offline-sound-coin',
     };
 
 
@@ -1319,10 +1320,12 @@
                     if  (crashed && obstacle.typeConfig.type === 'DINOCOIN') {
                         window.localStorage.setItem('dinoToken', (parseInt(window.localStorage.getItem('dinoToken')) || 0) + 1 )
                         document.getElementById('cryptodino-coins-collected').innerHTML = parseInt(window.localStorage.getItem('dinoToken')) || 0
+                        Runner.instance_.playSound(Runner.instance_.soundFx.COIN);
                         obstacle.remove = true
                         return false
                     } else if (obstacle.typeConfig.type === 'DINOEGG') {
                         window.localStorage.setItem('dinoEggs', Math.min(window.localStorage.getItem('dinoEggs') + 1, 5));
+                        Runner.instance_.playSound(Runner.instance_.soundFx.COIN);
                         obstacle.remove = true
                         return false
                     } else if (crashed) {
